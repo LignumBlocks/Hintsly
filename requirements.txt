@@ -1,0 +1,7 @@
+langchain
+langchain-community
+langchain-chroma
+chromadb
+pytest
+python-dotenv
+
