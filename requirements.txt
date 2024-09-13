@@ -1,7 +1,11 @@
 langchain
+# langchain-google-vertexai
+langchain-google-genai
+langchain-openai
 langchain-community
 langchain-chroma
 chromadb
+numpy
 pytest
 python-dotenv
 
