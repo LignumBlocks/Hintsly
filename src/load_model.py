@@ -3,7 +3,7 @@ from langchain_openai import OpenAIEmbeddings, OpenAI, ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage
 from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler
 from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
@@ -43,11 +43,13 @@ class LLMmodel:
                                             )
         self.session_id = str(uuid.uuid4())
         self.store = {}
-        self.llm_w_history = RunnableWithMessageHistory(self.llm, self.get_session_history)
-
-    def run(self, prompt:str, system_prompt=None):
-        response = self.llm.invoke(prompt)#([HumanMessage(content=prompt)])
-        print("Chat response :", response)
+    def run(self, input:str, system_prompt=None):
+        if not system_prompt:
+            system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
+        chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), MessagesPlaceholder(variable_name="messages"),])
+        chain = chat_prompt | self.llm
+        response = chain.invoke({"messages": [HumanMessage(content=input)]})
+        print("Chat response :", response.content)
         return response.content
 
     def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
@@ -55,10 +57,15 @@ class LLMmodel:
             self.store[session_id] = InMemoryChatMessageHistory()
         return self.store[session_id]
 
-    def run_with_history(self, prompt:str, system_prompt=None):
+    def run_with_history(self, input:str, system_prompt=None):
+        if not system_prompt:
+            system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
+        chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), MessagesPlaceholder(variable_name="messages"),])
+        chain = chat_prompt | self.llm
+        self.llm_w_history = RunnableWithMessageHistory(chain, self.get_session_history)
         config = {"configurable": {"session_id": self.session_id}}
-        response = self.llm_w_history.invoke([HumanMessage(content=prompt)], config=config)
-        print("History chat response :", response)
+        response = self.llm_w_history.invoke([HumanMessage(content=input)], config=config)
+        print("History chat response :", response.content)
         return response.content
 
     def simple_rag(docs):
