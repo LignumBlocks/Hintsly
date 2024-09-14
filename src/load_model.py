@@ -4,10 +4,12 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage, trim_messages
 from langchain_core.callbacks import CallbackManager, StreamingStdOutCallbackHandler
 from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.runnables import RunnablePassthrough
+from operator import itemgetter
 from langchain import hub
 import uuid
 from dotenv import load_dotenv
@@ -43,11 +45,19 @@ class LLMmodel:
                                             )
         self.session_id = str(uuid.uuid4())
         self.store = {}
+        self.trimmer = trim_messages(max_tokens=8000,
+                                    strategy="last",
+                                    token_counter=self.llm,
+                                    include_system=True,
+                                    allow_partial=False,
+                                    start_on="human",)
     def run(self, input:str, system_prompt=None):
         if not system_prompt:
             system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
-        chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), MessagesPlaceholder(variable_name="messages"),])
-        chain = chat_prompt | self.llm
+        chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), 
+                                                        MessagesPlaceholder(variable_name="messages"),])
+        chain = (RunnablePassthrough.assign(messages=itemgetter("messages") | self.trimmer) 
+                 | chat_prompt | self.llm)
         response = chain.invoke({"messages": [HumanMessage(content=input)]})
         print("Chat response :", response.content)
         return response.content
@@ -60,7 +70,8 @@ class LLMmodel:
     def run_with_history(self, input:str, system_prompt=None):
         if not system_prompt:
             system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
-        chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), MessagesPlaceholder(variable_name="messages"),])
+        chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), 
+                                                        MessagesPlaceholder(variable_name="messages"),])
         chain = chat_prompt | self.llm
         self.llm_w_history = RunnableWithMessageHistory(chain, self.get_session_history)
         config = {"configurable": {"session_id": self.session_id}}
