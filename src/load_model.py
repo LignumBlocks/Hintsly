@@ -24,6 +24,7 @@ class LLMmodel:
         self,
         model_name: str = "gemini-1.5-flash",
         temperature: float = 0.7,
+        # output_structure=None
         # max_tokens: int = 32000,
         # cpu_threads: int = 20,
         # gpu_layers: int = 12,
@@ -43,6 +44,7 @@ class LLMmodel:
                                             # max_retries=2,
                                             # other params...
                                             )
+        
         self.session_id = str(uuid.uuid4())
         self.store = {}
         self.trimmer = trim_messages(max_tokens=8000,
@@ -51,7 +53,19 @@ class LLMmodel:
                                     include_system=True,
                                     allow_partial=False,
                                     start_on="human",)
-    def run(self, input:str, system_prompt=None):
+    
+    def classify_run(self, input: str, system_prompt: str, output_structure):
+        if not system_prompt:
+            system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
+        tagging_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), MessagesPlaceholder(variable_name="messages")])
+        self.llm_structured = self.llm.with_structured_output(output_structure)
+        tagging_chain = tagging_prompt | self.llm_structured
+        
+        response = tagging_chain.invoke({"messages": [HumanMessage(content=input)]})
+        print(response)
+        return response
+    
+    def run(self, input: str, system_prompt=None):
         if not system_prompt:
             system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
         chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), 
@@ -67,7 +81,7 @@ class LLMmodel:
             self.store[session_id] = InMemoryChatMessageHistory()
         return self.store[session_id]
 
-    def run_with_history(self, input:str, system_prompt=None):
+    def run_with_history(self, input: str, system_prompt=None):
         if not system_prompt:
             system_prompt = "You are a helpful assistant. Answer all questions to the best of your ability."
         chat_prompt = ChatPromptTemplate.from_messages([("system", system_prompt), 

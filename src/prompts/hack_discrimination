@@ -13,7 +13,7 @@ When scanning content, prioritize hacks that meet the following criteria:
 
 content
 ---
-{content}
+{source_text}
 ---
 
 Scan the content for financial advice or strategies. Evaluate if the content meets the criteria of a financial hack as defined above.
