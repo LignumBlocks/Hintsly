@@ -28,20 +28,20 @@ Analize the previous content and assign a classification for each category (usef
 The output must be a json with the following structure:
 ```json
 {{
-    "usefulness": {
+    "usefulness": {{
         "classification": "<High Usefulness or Low Usefulness>",
         "explanation": "<A short explanation regarding the classification>",
         "score": "<score from 1 to 5>",
-    },
-    "complexity": {
+    }},
+    "complexity": {{
         "classification": "<High Complexity or Low Complexity>",
         "explanation": "<A short explanation regarding the classification>",
         "score": "<score from 1 to 5>",
-    },
-    "uniqueness": {
+    }},
+    "uniqueness": {{
         "classification": "<Unique or Common>",
         "explanation": "<A short explanation regarding the classification>",
         "score": "<score from 1 to 5>",
-    },
+    }},
 }}
 ```

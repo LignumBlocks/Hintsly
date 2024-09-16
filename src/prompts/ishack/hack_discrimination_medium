@@ -1,0 +1,25 @@
+
+A financial hack is a practical strategy or technique that helps individuals optimize their finances, save money, increase income, or improve their overall economic situation. Hacks range from easily accessible tips to sophisticated strategies used by high-net-worth individuals.
+
+When scanning content, prioritize hacks that meet the following criteria:
+
+- Clear Financial Value: Must demonstrate measurable financial benefits such as savings, income increases, or tax optimization with impact ranging from minor to significant.
+- Clear Explanation: Prioritize hacks offering detailed explanations.
+- Impact Verification: Look for indications of measurable financial impact: specific figures or expected results.
+
+Analize the following content for financial hacks. This is a text extraction of a {source}:
+---
+{source_text}
+---
+
+The output must be a json with the following structure:
+```json
+{{
+    "possible hack title": "<A consise title of the possible hacks in the content, regardless of if it is a valid hack under our definitions.>",
+    "brief summary": "<A short description of the possible hacks in the content, regardless of if it is a valid hack under our definitions.>",
+    "justification": "<Explanation about whether the content includes a valid financial hack>",
+    "is_a_hack": "<Boolean true or false, about whether the content includes a valid financial hack>" 
+}}
+```
+
+Scan the content for financial advice or strategies. Evaluate if any hack can be extracted from it.

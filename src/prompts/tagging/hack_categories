@@ -1,0 +1,98 @@
+Bellow you will be provided with a financial hack description. According to the following financial categories state the applicable tags to the provided information. The categories are diplayed in this format:
+- `Main category`
+  - `subcategory1`
+  - `subcategory2`
+  - `subcategory3`
+
+## Financial categories
+
+- `Corporate Finance`: financial activities of corporations, including investment decisions, financial management, and capital structure.
+  - `Capital Structure`
+  - `Capital Budgeting` : planning and managing a company’s long-term investments. Techniques include Net Present Value (NPV), Internal Rate of Return (IRR), and Payback Period.
+  - `Mergers and Acquisitions`
+  - `Dividend Policy`:
+- `Investment Management`
+  - `Portfolio Management`:
+  - `Mutual Funds`:
+  - `Hedge Funds`:
+  - `Private Equity`:
+  - `Real Estate Investment`:
+- `Personal Finance`
+  - `Budgeting`:
+  - `Retirement Planning`:
+  - `Insurance`:
+  - `Real Estate`:
+  - `Debt Management`:
+  - `Estate Planning`:
+- `Financial Markets`
+  - `Stock Market`:
+  - `Bond Market`:
+  - `Derivatives Market`:
+- `Public Finance`
+  - `Government Budgeting`:
+  - `Taxation`:
+  - `Public Debt`:
+- `Banking and Financial Institutions`
+  - `Commercial Banking`:
+  - `Investment Banking`:
+  - `Central Banking`:
+- `Risk Management`
+  - `Financial Risk`:
+  - `Insurance Risk`:
+  - `Hedging Strategies`:
+- `International Finance`
+  - `Foreign Exchange Markets`:
+  - `International Trade Finance`:
+  - `International Financial Institutions`:
+- `Financial Planning and Analysis`
+  - `Personal Financial Planning`:
+  - `Corporate Financial Planning`:
+  - `Investment Analysis`:
+- `Fintech and Emerging Technologies`
+  - `Digital Payments`:
+  - `Robo-Advisors`:
+  - `Peer-to-Peer Lending`:
+- `Behavioral Finance`
+  - `Psychological Biases in Finance`:
+  - `Behavioral Investing`:
+  - `Financial Educatio`:
+- `Ethics in Finance`
+  - `Corporate Governance`:
+  - `Financial Regulation`:
+  - `Ethical Investing`:
+
+## Financial hack description:
+---
+{hack_description}
+---
+
+Analize the previous content and assign a classification for each category (usefulness, complexity, and uniqueness). Also assign a score based on the classification.
+
+The output must be the appropriate main tag and subtag. If there is more than one category fitting then return them all.
+Example for more than one tag:
+```json
+[
+  {{
+    "category": "<main category with the same name as it was listed>",
+    "subcategory": "<sub-category with the same name as it was listed>"
+  }},
+  {{
+    "category": "<main category with the same name as it was listed>",
+    "subcategory": "<sub-category with the same name as it was listed>"
+  }},
+  // ...
+]
+```
+Example for one tag:
+```json
+[
+  {{
+    "category": "<main category with the same name as it was listed>",
+    "subcategory": "<sub-category with the same name as it was listed>"
+  }}
+]
+```
+
+If the financial hack description does not match with any of the cateories the answer must apply this format:
+
+'None: <comma separated list of tags suggested>'

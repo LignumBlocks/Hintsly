@@ -36,7 +36,9 @@ def discriminate_hacks_from_text(source_text: str, source: str):
                 "is_a_hack": "<true or false>" 
             }`
     """
-    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION'])
+    # prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION0'])
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION1'])
+    # prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION2'])
     prompt = prompt_template.format(source_text=source_text, source=source)
     system_prompt = "You are an AI financial analyst tasked with classifying content related to financial strategies."
     # print(prompt)
@@ -54,9 +56,9 @@ def discriminate_hacks_from_text(source_text: str, source: str):
 
 def process_transcriptions():
     # data_folder = os.path.join(DATA_DIR, 'Transcriptions Nobudgetbabe')
-    hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination_10.csv')
-    data_folder = os.path.join(DATA_DIR, '10_test_cases')
-    # hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination_tests.csv')
+    # hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination.csv')
+    data_folder = os.path.join(DATA_DIR, 'test_cases')
+    hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination_tests_1.csv')
     
     if os.path.isfile(hacks_discrimination_csv_path):
         hacks_discrimination = pd.read_csv(hacks_discrimination_csv_path)
@@ -88,7 +90,8 @@ def process_transcriptions():
 
         # Prepare the new row
         new_row_index = len(hacks_discrimination)  # Get the next index
-        hacks_discrimination.loc[new_row_index] = [file_name_without_extension, 'tiktok Nobudgetbabe', result['is_a_hack'], result['possible hack title'], result['brief summary'], result['justification']]
+        source = (file_name_without_extension.split('_')[0])[1:]
+        hacks_discrimination.loc[new_row_index] = [file_name_without_extension, source, result['is_a_hack'], result['possible hack title'], result['brief summary'], result['justification']]
         file_counter += 1
         
         # Save to CSV every 10 files
