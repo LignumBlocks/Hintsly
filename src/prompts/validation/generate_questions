@@ -1,0 +1,12 @@
+Given the following financial hack, provide a set of {num_queries}
+of relevant queries that would allow to check the validity of the hack. The queries will be used in official financial pages to search for information that can validate or refuse the fact or suggestions in the hack.
+
+Financial hack summary:
+{hack_summary}
+
+Answer only with a JSON object containing a list of the relevant queries,
+in the following format:
+
+{{
+    "queries": [ ... ] # list of relevant queries
+}}
