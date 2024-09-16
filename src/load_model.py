@@ -38,7 +38,8 @@ class LLMmodel:
             self.llm = ChatOpenAI(model=self.model_name)
         else:
             self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash",
-                                            # temperature=0.7,
+                                              cache=False,
+                                              temperature=0.4,
                                             # max_tokens=None,
                                             # timeout=None,
                                             # max_retries=2,

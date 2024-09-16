@@ -9,4 +9,5 @@ PROMPT_DIR = os.path.join(SRC_DIR, 'prompts')
 # prompts
 PROMPTS_TEMPLATES = {
     'HACK_DISCRIMINATION':os.path.join(PROMPT_DIR, "hack_discrimination"),
+    'HACK_DISCRIMINATION1':os.path.join(PROMPT_DIR, "hack_discrimination copy"),
     }
