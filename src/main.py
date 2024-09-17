@@ -53,7 +53,34 @@ def discriminate_hacks_from_text(source_text: str, source: str):
     except Exception as er:
         print(f"Error discriminating hacks: {er}")
         return None, prompt
+    
+def get_queries_for_validation(source_text: str, num_queries: int):
+    """ For a hack summary select validate against real sources.
+    
+    Args:
+        source_text (str): Text content to analyse.
 
+    Returns:
+        `list: relevant queries for the given text`
+    """
+    
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION1'])
+    prompt = prompt_template.format(hack_summary=source_text, num_queries=num_queries)
+    system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
+    
+    try:
+        model = load_model.LLMmodel("gpt-4o-mini")
+        result:str = model.run(prompt, system_prompt)
+        cleaned_string = result.replace("```json\n", "").replace("```","")
+        # Strip leading and trailing whitespace
+        cleaned_string = cleaned_string.strip()
+        return json.loads(cleaned_string), prompt
+    except Exception as er:
+        print(f"Error discriminating hacks: {er}")
+        return None, prompt
+
+def get_queries():
+    pass
 def process_transcriptions():
     # data_folder = os.path.join(DATA_DIR, 'Transcriptions Nobudgetbabe')
     # hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination.csv')
@@ -103,12 +130,21 @@ def process_transcriptions():
     if not hacks_discrimination.empty:
         hacks_discrimination.to_csv(hacks_discrimination_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
-   
+
+def add_link_to_csv(csv_path= os.path.join(DATA_DIR, 'hacks_discrimination_tests_1.csv')):
+    repo_base_url = "https://github.com/LignumBlocks/Hintsly/tree/main/data/test_cases/"
+    df = pd.read_csv(csv_path)
+    # link = f"{repo_base_url}{file_name}"
+    df.insert(1, 'Link', repo_base_url + (df.iloc[:, 0].astype(str) + '.txt'))
+    df.to_csv(csv_path, index=False)
+
 if __name__ == "__main__":
     # df = pd.read_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv')) 
     # sorted_df = df.sort_values(by=df.columns[0])
     # sorted_df.to_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv'), index=False) 
-    process_transcriptions()
+    add_link_to_csv(os.path.join(DATA_DIR, 'hacks_discrimination_tests_0.csv'))
+    add_link_to_csv(os.path.join(DATA_DIR, 'hacks_discrimination_tests_1.csv'))
+    add_link_to_csv(os.path.join(DATA_DIR, 'hacks_discrimination_tests_2.csv'))
     # model.run("What is your favorite color?")
     # model.run_with_history("Hello, I'm Niley")
     # model.run_with_history("What is my name?")
