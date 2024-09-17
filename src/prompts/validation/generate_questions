@@ -8,5 +8,5 @@ Answer only with a JSON object containing a list of the relevant queries,
 in the following format:
 
 {{
-    "queries": [ ... ] # list of relevant queries
+    "queries": [ ... ]
 }}

@@ -54,7 +54,7 @@ def discriminate_hacks_from_text(source_text: str, source: str):
         print(f"Error discriminating hacks: {er}")
         return None, prompt
     
-def get_queries_for_validation(source_text: str, num_queries: int):
+def get_queries_for_validation(source_text: str, num_queries: int=4):
     """ For a hack summary select validate against real sources.
     
     Args:
@@ -64,7 +64,7 @@ def get_queries_for_validation(source_text: str, num_queries: int):
         `list: relevant queries for the given text`
     """
     
-    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION1'])
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['GET_QUERIES'])
     prompt = prompt_template.format(hack_summary=source_text, num_queries=num_queries)
     system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
     
@@ -79,8 +79,34 @@ def get_queries_for_validation(source_text: str, num_queries: int):
         print(f"Error discriminating hacks: {er}")
         return None, prompt
 
-def get_queries():
-    pass
+def get_queries(csv_path: str):
+    source_df = pd.read_csv(csv_path)
+    validation_queries_csv_path = os.path.join(DATA_DIR, 'validation_queries_test1.csv')
+    if os.path.isfile(validation_queries_csv_path):
+        df = pd.read_csv(validation_queries_csv_path)
+    else:
+        df = pd.DataFrame(columns=['file_name', 'brief summary', 'queries'])
+    
+    counter = 0
+
+    for index, row in source_df.iterrows():
+        file_name = row['file_name']        
+        brief_summary = row['brief summary'] 
+
+        query_results, prompt = get_queries_for_validation(brief_summary)
+        query_results = query_results['queries']
+        new_row_index = len(df)
+        df.loc[new_row_index] = [file_name, brief_summary, query_results]
+        counter += 1
+
+        if counter % 10 == 0:
+            df.to_csv(validation_queries_csv_path, index=False)
+            print(f'Saved {counter} files to CSV.')
+    # Save any remaining data
+    if not df.empty:
+        df.to_csv(validation_queries_csv_path, index=False)
+        print('Final save: saved remaining files to CSV.')
+
 def process_transcriptions():
     # data_folder = os.path.join(DATA_DIR, 'Transcriptions Nobudgetbabe')
     # hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination.csv')
@@ -142,9 +168,7 @@ if __name__ == "__main__":
     # df = pd.read_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv')) 
     # sorted_df = df.sort_values(by=df.columns[0])
     # sorted_df.to_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv'), index=False) 
-    add_link_to_csv(os.path.join(DATA_DIR, 'hacks_discrimination_tests_0.csv'))
-    add_link_to_csv(os.path.join(DATA_DIR, 'hacks_discrimination_tests_1.csv'))
-    add_link_to_csv(os.path.join(DATA_DIR, 'hacks_discrimination_tests_2.csv'))
+    get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests_0.csv'))
     # model.run("What is your favorite color?")
     # model.run_with_history("Hello, I'm Niley")
     # model.run_with_history("What is my name?")
