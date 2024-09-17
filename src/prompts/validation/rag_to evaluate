@@ -1,0 +1,16 @@
+Here is an extract of relevant context from different web pages:
+
+---
+{chunks}
+---
+
+Given the provided search context, please validate or refute the following financial hack acoording to this factors:
+A financial hack is a practical strategy or technique that helps individuals optimize their finances, save money, increase income, or improve their overall economic situation. Hacks range from easily accessible tips to sophisticated strategies used by high-net-worth individuals.
+- Legality and Risks: Must comply with legal standards, highlighting legal implications, tax loopholes, and ethical issues.
+- Temporal Relevance: Must be suitable for the current economic context.
+
+Financial hack title:
+{hack_title}
+---
+Financial hack summary:
+{hack_summary}

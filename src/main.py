@@ -77,6 +77,23 @@ def get_queries_for_validation(source_text: str, num_queries: int=4):
         print(f"Error discriminating hacks: {er}")
         return None, prompt
 
+def validate_financial_hack(hack_title: str, hack_summary: str, query_csv_path: str):
+    try:
+        model = load_model.LLMmodel("gpt-4o-mini")
+        model.vector_store_from_query_csv(query_csv_path)
+        chunks = "\n".join([result.page_content for result in model.retrieve_similar_chunks(hack_summary)])
+
+        prompt_template:str = load_prompt(PROMPTS_TEMPLATES['VALIDATE_HACK'])
+        prompt = prompt_template.format(chunks=chunks, hack_title=hack_title, hack_summary=hack_summary)
+        system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
+        
+        result:str = model.run(prompt, system_prompt)
+        
+        return result, prompt
+    except Exception as er:
+        print(f"Error discriminating hacks: {er}")
+        return None, prompt
+
 def get_queries(csv_path: str):
     source_df = pd.read_csv(csv_path)
     validation_queries_csv_path = os.path.join(DATA_DIR, 'validation_queries_test1.csv')

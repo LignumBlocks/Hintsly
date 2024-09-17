@@ -12,4 +12,5 @@ PROMPTS_TEMPLATES = {
     'HACK_DISCRIMINATION1':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_medium"),
     'HACK_DISCRIMINATION2':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_reduced"),
     'GET_QUERIES':os.path.join(PROMPT_DIR, "validation", "generate_questions"),
+    'VALIDATE_HACK':os.path.join(PROMPT_DIR, "validation", "rag_to_evaluate"),
     }

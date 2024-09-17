@@ -12,6 +12,7 @@ from langchain_core.runnables import RunnablePassthrough
 from operator import itemgetter
 from langchain import hub
 import uuid
+import pandas as pd
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -98,3 +99,27 @@ class LLMmodel:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         splits = text_splitter.split_documents(docs)
         vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+
+    def retrieve_similar_chunks(self, query):
+        results = self.vector_store.similarity_search(query, k=4)
+        return results
+    
+    def vector_store_from_query_csv(self, csv_path: str):
+        df = pd.read_csv(csv_path)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        
+        documents = []
+        metadatas = []
+        for index, row in df.iterrows():
+            content_chunks = text_splitter.split_text(row['content'])
+            for chunk in content_chunks:
+                documents.append(chunk)
+                metadatas.append({
+                    "query": row['query'],
+                    "title": row['title'],
+                    "description": row['description'],
+                    "link": row['link']
+                })
+        embedding = OpenAIEmbeddings()
+        self.vector_store = Chroma.from_texts(documents, embedding, metadatas=metadatas)
+        return self.vector_store
