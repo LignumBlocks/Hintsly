@@ -52,7 +52,7 @@ def discriminate_hacks_from_text(source_text: str, source: str):
         print(f"Error discriminating hacks: {er}")
         return None, prompt
     
-def get_queries_for_validation(source_text: str, num_queries: int=4):
+def get_queries_for_validation(hack_title: str, source_text: str, num_queries: int=4):
     """ For a hack summary select validate against real sources.
     
     Args:
@@ -63,7 +63,7 @@ def get_queries_for_validation(source_text: str, num_queries: int=4):
     """
     
     prompt_template:str = load_prompt(PROMPTS_TEMPLATES['GET_QUERIES'])
-    prompt = prompt_template.format(hack_summary=source_text, num_queries=num_queries)
+    prompt = prompt_template.format(hack_title=hack_title, hack_summary=source_text, num_queries=num_queries)
     system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
     
     try:
@@ -78,29 +78,32 @@ def get_queries_for_validation(source_text: str, num_queries: int=4):
         return None, prompt
 
 def validate_financial_hack(hack_title: str, hack_summary: str, query_csv_path: str):
-    try:
-        model = load_model.LLMmodel("gpt-4o-mini")
-        model.vector_store_from_query_csv(query_csv_path)
-        chunks = "\n".join([result.page_content for result in model.retrieve_similar_chunks(hack_summary)])
+    # try:
+    model = load_model.LLMmodel("gpt-4o-mini")
+    model.vector_store_from_query_csv(query_csv_path)
+    chunks = ""
+    for result in model.retrieve_similar_chunks(hack_summary):
+        print(result)
+        chunks += result.page_content + "\n"
 
-        prompt_template:str = load_prompt(PROMPTS_TEMPLATES['VALIDATE_HACK'])
-        prompt = prompt_template.format(chunks=chunks, hack_title=hack_title, hack_summary=hack_summary)
-        system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
-        
-        result:str = model.run(prompt, system_prompt)
-        
-        return result, prompt
-    except Exception as er:
-        print(f"Error discriminating hacks: {er}")
-        return None, prompt
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['VALIDATE_HACK'])
+    prompt = prompt_template.format(chunks=chunks, hack_title=hack_title, hack_summary=hack_summary)
+    system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
+    
+    result:str = model.run(prompt, system_prompt)
+    
+    return result, prompt
+    # except Exception as er:
+    #     print(f"Error discriminating hacks: {er}")
+    #     return None, prompt
 
 def get_queries(csv_path: str):
     source_df = pd.read_csv(csv_path)
-    validation_queries_csv_path = os.path.join(DATA_DIR, 'validation_queries_test1.csv')
+    validation_queries_csv_path = os.path.join(DATA_DIR, 'validation_queries_test.csv')
     if os.path.isfile(validation_queries_csv_path):
         df = pd.read_csv(validation_queries_csv_path)
     else:
-        df = pd.DataFrame(columns=['file_name', 'brief summary', 'queries'])
+        df = pd.DataFrame(columns=['file_name', 'title', 'brief summary', 'queries'])
     
     counter = 0
 
@@ -109,13 +112,14 @@ def get_queries(csv_path: str):
         if not row['hack_status']:
             print(row['hack_status'])
             continue
-        file_name = row['file_name']        
+        file_name = row['file_name']     
+        title = row['title']        
         brief_summary = row['brief summary'] 
 
-        query_results, prompt = get_queries_for_validation(brief_summary)
+        query_results, prompt = get_queries_for_validation(title, brief_summary)
         query_results = query_results['queries']
         new_row_index = len(df)
-        df.loc[new_row_index] = [file_name, brief_summary, query_results]
+        df.loc[new_row_index] = [file_name, title, brief_summary, query_results]
         counter += 1
 
         if counter % 10 == 0:
@@ -187,8 +191,11 @@ if __name__ == "__main__":
     # df = pd.read_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv')) 
     # sorted_df = df.sort_values(by=df.columns[0])
     # sorted_df.to_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv'), index=False) 
-    # get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests_0.csv'))
-    process_transcriptions()
-    # model.run("What is your favorite color?")
-    # model.run_with_history("Hello, I'm Niley")
-    # model.run_with_history("What is my name?")
+    get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests.csv'))
+    # process_transcriptions()
+    # hack_title = "The Mindful Budgeting and Debt Snowball Strategy"
+    # hack_summary = "This strategy focuses on cultivating a positive mindset, implementing a structured budgeting system with dedicated accounts, and utilizing the debt snowball method to achieve financial freedom and build savings."
+    # query_csv_path = os.path.join(DATA_DIR, 'sources_for_validation.csv')
+    # result = validate_financial_hack(hack_title, hack_summary, query_csv_path)
+    # print(result[1])
+    # print(result[0])
