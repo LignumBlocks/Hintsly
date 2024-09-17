@@ -1,6 +1,8 @@
-Given the following financial hack, provide a set of {num_queries}
-of relevant queries that would allow to check the validity of the hack. The queries will be used in official financial pages to search for information that can validate or refuse the fact or suggestions in the hack.
+Given the following financial hack, provide a set of {num_queries} of relevant queries that would allow to check the validity of the hack. The queries will be used in official financial pages to search for information that can validate or refuse the techniques or suggestions in the hack. Try to use terms from the hack title when possible, and keep it consise without many filler words.
 
+Financial hack title:
+{hack_title}
+---
 Financial hack summary:
 {hack_summary}
 

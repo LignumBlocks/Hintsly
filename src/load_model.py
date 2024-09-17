@@ -13,7 +13,9 @@ from operator import itemgetter
 from langchain import hub
 import uuid
 import pandas as pd
+import json
 from dotenv import load_dotenv
+from settings import DATA_DIR
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
@@ -105,21 +107,39 @@ class LLMmodel:
         return results
     
     def vector_store_from_query_csv(self, csv_path: str):
+        persist_directory = os.path.join(DATA_DIR, "chroma_langchain_db")
+        embeddings = OpenAIEmbeddings()
+        # if os.path.isdir(persist_directory):
+        #     print('loading from persist directory')
+        #     self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+        #     print('vectore_store ready')
+        #     return self.vector_store
         df = pd.read_csv(csv_path)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         
         documents = []
         metadatas = []
         for index, row in df.iterrows():
-            content_chunks = text_splitter.split_text(row['content'])
-            for chunk in content_chunks:
-                documents.append(chunk)
-                metadatas.append({
-                    "query": row['query'],
-                    "title": row['title'],
-                    "description": row['description'],
-                    "link": row['link']
-                })
-        embedding = OpenAIEmbeddings()
-        self.vector_store = Chroma.from_texts(documents, embedding, metadatas=metadatas)
+            if not pd.isna(row['content']) and row['content'] != '' and row['content'] != 'Error al cargar el contenido':
+                content_chunks = text_splitter.split_text(row['content'])
+                for chunk in content_chunks:
+                    documents.append(chunk)
+                    metadatas.append({
+                        "query": row['query'],
+                        "source": row['source'],
+                        "title": row['title'],
+                        "description": row['description'],
+                        "link": row['link']
+                    })
+                    # print(documents[-1])
+                    # print(metadatas[-1])
+        data = { "documents": documents, "metadatas": metadatas }
+
+        with open('data.json', 'w') as json_file:
+            json.dump(data, json_file)
+
+        self.vector_store = Chroma.from_texts(documents, embeddings, metadatas=metadatas, persist_directory=persist_directory,
+                                            collection_name="hermoneymastery_video_7254212698383142187")
+        
+        print('vectore_store ready')
         return self.vector_store
