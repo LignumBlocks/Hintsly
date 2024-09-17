@@ -36,9 +36,7 @@ def discriminate_hacks_from_text(source_text: str, source: str):
                 "is_a_hack": "<true or false>" 
             }`
     """
-    # prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION0'])
-    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION1'])
-    # prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION2'])
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION0'])
     prompt = prompt_template.format(source_text=source_text, source=source)
     system_prompt = "You are an AI financial analyst tasked with classifying content related to financial strategies."
     # print(prompt)
@@ -90,6 +88,10 @@ def get_queries(csv_path: str):
     counter = 0
 
     for index, row in source_df.iterrows():
+        print(row['hack_status'])
+        if not row['hack_status']:
+            print(row['hack_status'])
+            continue
         file_name = row['file_name']        
         brief_summary = row['brief summary'] 
 
@@ -111,7 +113,7 @@ def process_transcriptions():
     # data_folder = os.path.join(DATA_DIR, 'Transcriptions Nobudgetbabe')
     # hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination.csv')
     data_folder = os.path.join(DATA_DIR, 'test_cases')
-    hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination_tests_1.csv')
+    hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination_tests.csv')
     
     if os.path.isfile(hacks_discrimination_csv_path):
         hacks_discrimination = pd.read_csv(hacks_discrimination_csv_path)
@@ -168,7 +170,8 @@ if __name__ == "__main__":
     # df = pd.read_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv')) 
     # sorted_df = df.sort_values(by=df.columns[0])
     # sorted_df.to_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv'), index=False) 
-    get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests_0.csv'))
+    # get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests_0.csv'))
+    process_transcriptions()
     # model.run("What is your favorite color?")
     # model.run_with_history("Hello, I'm Niley")
     # model.run_with_history("What is my name?")

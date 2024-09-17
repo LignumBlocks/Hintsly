@@ -19,7 +19,7 @@ Analize the following content for financial hacks. This is a text extraction of 
 The output must be a json with the following structure:
 ```json
 {{
-    "possible hack title": "<A consise title of the possible hacks in the content, regardless of if it is a valid hack under our definitions.>",
+    "possible hack title": "<A title of the possible hack in the content. Must be a descriptive name that showcases the particularities of the hack. Try to make it unique.>",
     "brief summary": "<A short description of the possible hacks in the content, regardless of if it is a valid hack under our definitions.>",
     "justification": "<Explanation about whether the content includes a valid financial hack>",
     "is_a_hack": "<Boolean true or false, about whether the content includes a valid financial hack>" 
