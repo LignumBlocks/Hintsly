@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import json
 from settings import BASE_DIR, SRC_DIR, DATA_DIR
 from process_and_validate import discriminate_hacks_from_text, get_queries_for_validation, validate_financial_hack
 
@@ -108,7 +109,7 @@ def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
         title = row['title']        
         brief_summary = row['brief summary'] 
 
-        results, prompt, metadata = validate_financial_hack(title, brief_summary, validation_sources_csvs[index])
+        results, prompt, metadata = validate_financial_hack(file_name, title, brief_summary, validation_sources_csvs[index])
         status = results['validation status']
         analysis = results['validation analysis']
         relevant_sources = get_clean_links(metadata)
@@ -117,7 +118,7 @@ def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
         df.loc[new_row_index] = [file_name, title, brief_summary, status, analysis, relevant_sources]
         counter += 1
 
-        if counter % 10 == 0:
+        if counter % 5 == 0:
             df.to_csv(validation_result_csv_path, index=False)
             print(f'Saved {counter} files to CSV.')
 
@@ -126,6 +127,21 @@ def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
         df.to_csv(validation_result_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
 
+def split_search_results():
+    queries_df = pd.read_csv(os.path.join(DATA_DIR, 'validation_queries_test.csv'))
+    search_results_df = pd.read_csv(os.path.join(DATA_DIR, 'validation', 'scraping_results_f5.csv'))
+    for index, row in queries_df.iterrows():
+        values_to_match = json.loads(row['queries'].replace("'", '"')) 
+        # print(search_results_df['query'][0] in (values_to_match))
+        # subset_df = search_results_df[search_results_df['query'].isin(values_to_match)]
+        subset_df = search_results_df[search_results_df.iloc[:, 0].isin(values_to_match)]
+        
+        # Do something with the matching results (e.g., print, save to file, etc.)
+        # print(f"Matching results for query {subset_df}")
+        if not subset_df.empty:
+            # Save the subset as a CSV with the filename from the reference CSV
+            row['file_name'] 
+            subset_df.to_csv(os.path.join(DATA_DIR, 'validation', f"sources_for_validation_{row['file_name']}.csv"), index=False) 
 
 def add_link_to_csv(csv_path= os.path.join(DATA_DIR, 'hacks_discrimination_tests_1.csv')):
     repo_base_url = "https://github.com/LignumBlocks/Hintsly/tree/main/data/test_cases/"
@@ -140,4 +156,10 @@ if __name__ == "__main__":
     # sorted_df.to_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv'), index=False) 
     # process_transcriptions()
     # get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests.csv'))
-    validate_hacks(os.path.join(DATA_DIR, 'validation_queries_test.csv'),[os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv')])
+    validate_hacks(os.path.join(DATA_DIR, 'validation_queries_test.csv'),
+                   [os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv'),
+                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv'),
+                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7287292622924893486.csv'),
+                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7301700833052314922.csv'),
+                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7329918298571820331.csv')])
+    # split_search_results()

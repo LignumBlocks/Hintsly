@@ -106,14 +106,14 @@ class LLMmodel:
         results = self.vector_store.similarity_search(query, k=4)
         return results
     
-    def vector_store_from_query_csv(self, csv_path: str):
+    def vector_store_from_query_csv(self, csv_path: str, sourcename):
         persist_directory = os.path.join(DATA_DIR, "chroma_langchain_db")
         embeddings = OpenAIEmbeddings()
-        if os.path.isdir(persist_directory):
-            print('loading from persist directory')
-            self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
-            print('vectore_store ready')
-            return self.vector_store
+        # if os.path.isdir(persist_directory):
+        #     print('loading from persist directory')
+        #     self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+        #     print('vectore_store ready')
+        #     return self.vector_store
         df = pd.read_csv(csv_path)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         
