@@ -14,3 +14,11 @@ Financial hack title:
 ---
 Financial hack summary:
 {hack_summary}
+
+If the information is not enough to emit an opinion about the validity or you are unsure answer Unknown.
+Provide your response only as a JSON object containing the analysis, in the following format:
+
+{{
+    "validation analysis": "<Deep analysis about the validity of the hack, according to the factors above, it can be in markdown format>",
+    "validation status": "<Valid, Invalid or Unknown accordingly>"
+}}

@@ -1,4 +1,8 @@
-Given the following financial hack, provide a set of {num_queries} of relevant queries that would allow to check the validity of the hack. The queries will be used in official financial pages to search for information that can validate or refuse the techniques or suggestions in the hack. Try to use terms from the hack title when possible, and keep it consise without many filler words.
+Given the following financial 'hack', generate a set of {num_queries} relevant queries that allow verifying the validity of the hack. The queries will be used on official financial websites to search for information that can validate or refute the techniques or suggestions of the hack. Make sure to:
+
+- Use key terms from the hack title and summary when possible.
+- Keep the queries concise and direct, without unnecessary filler words.
+- Formulate the queries in a way that they seek specific information related to the validity of the hack.
 
 Financial hack title:
 {hack_title}
@@ -6,8 +10,7 @@ Financial hack title:
 Financial hack summary:
 {hack_summary}
 
-Answer only with a JSON object containing a list of the relevant queries,
-in the following format:
+Provide your response only as a JSON object containing a list of the relevant queries, in the following format:
 
 {{
     "queries": [ ... ]

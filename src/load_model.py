@@ -109,11 +109,11 @@ class LLMmodel:
     def vector_store_from_query_csv(self, csv_path: str):
         persist_directory = os.path.join(DATA_DIR, "chroma_langchain_db")
         embeddings = OpenAIEmbeddings()
-        # if os.path.isdir(persist_directory):
-        #     print('loading from persist directory')
-        #     self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
-        #     print('vectore_store ready')
-        #     return self.vector_store
+        if os.path.isdir(persist_directory):
+            print('loading from persist directory')
+            self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
+            print('vectore_store ready')
+            return self.vector_store
         df = pd.read_csv(csv_path)
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
         
@@ -139,7 +139,7 @@ class LLMmodel:
             json.dump(data, json_file)
 
         self.vector_store = Chroma.from_texts(documents, embeddings, metadatas=metadatas, persist_directory=persist_directory,
-                                            collection_name="hermoneymastery_video_7254212698383142187")
+                                            collection_name="hermoneymastery_video_7286913008788426027")
         
         print('vectore_store ready')
         return self.vector_store
