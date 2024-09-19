@@ -1,11 +1,12 @@
-langchain
+langchain==0.3.0
 # langchain-google-vertexai
 langchain-google-genai
 langchain-openai
 langchain-community
-langchain-chroma
+langchain-chroma>=0.1.2
 chromadb
 numpy
 pytest
 python-dotenv
 pandas
+psycopg2

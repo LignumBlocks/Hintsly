@@ -13,5 +13,7 @@ PROMPTS_TEMPLATES = {
     'HACK_DISCRIMINATION2':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_reduced"),
     'GET_QUERIES':os.path.join(PROMPT_DIR, "validation", "generate_questions"),
     'VALIDATE_HACK':os.path.join(PROMPT_DIR, "validation", "rag_to evaluate"),
-    'DEEP_ANALYSIS':os.path.join(PROMPT_DIR, "deep_analysis"),
+    'DEEP_ANALYSIS':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis"),
+    'DEEP_ANALYSIS_FREE':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis_free"),
+    'DEEP_ANALYSIS_PREMIUM':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis_premium"),
     }

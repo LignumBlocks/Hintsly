@@ -1,0 +1,37 @@
+You are an expert financial analyst with a deep understanding of financial hacks and strategies. 
+
+**Hack Title**:
+{hack_title}
+---
+**Summary**:
+{hack_summary}
+---
+**Source Text of the Hack**:
+{original_text}
+---
+
+Your task is to provide a comprehensive analysis of the financial hack described above, adhering to the following guidelines:
+
+1. **Hack Title**:
+   - Provide a concise and engaging title for the hack.
+
+2. **Description**:
+   - Summarize the hack's concept and benefits in 2-3 sentences. Highlight how the hack improves the user's financial situation or habits.
+
+3. **Main Goal**:
+   - Clearly state the hack's primary purpose in one sentence.
+
+4. **Financial Category/Vehicle**:
+   - Identify the specific financial category this hack falls into (e.g., Debt Management, Savings, Budgeting, etc.).
+
+5. **Steps for Implementation (Summary)**:
+   - List 3-5 concise, actionable steps for the user to implement the hack.
+   - Ensure the steps are clear and simple enough for any user to follow without advanced knowledge.
+
+6. **Resources Needed**:
+   - List the essential tools, apps, or bank accounts necessary to implement the strategy effectively (e.g., specific apps, online banks, calculators).
+
+7. **Expected Benefits**:
+   - Briefly outline the financial or psychological benefits of applying the hack (e.g., improved savings discipline, accelerated debt payoff, reduced stress, etc.).
+
+Your Analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications.

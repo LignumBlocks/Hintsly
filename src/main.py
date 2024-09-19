@@ -93,7 +93,7 @@ def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
         return result_string
 
     hacks_queries_df = pd.read_csv(hacks_queries_csv_path) # file_name, title, brief summary, queries
-    validation_result_csv_path = os.path.join(DATA_DIR, 'validation_result_test.csv')
+    validation_result_csv_path = os.path.join(DATA_DIR, 'validation_result_test1.csv')
     if os.path.isfile(validation_result_csv_path):
         df = pd.read_csv(validation_result_csv_path)
     else:
@@ -129,10 +129,10 @@ def analyze_validated_hacks(validation_result_csv: str):
     validation_df = pd.read_csv(validation_result_csv)
     deep_analysis_csv_path = os.path.join(DATA_DIR, 'deep_analysis_results_test.csv')
     data_dir = os.path.join(DATA_DIR, 'test_cases')
-    if os.path.isfile(deep_analysis_csv_path):
-        df = pd.read_csv(deep_analysis_csv_path)
-    else:
-        df = pd.DataFrame(columns=['file_name', 'hack title', 'brief summary', 'deep analysis'])
+    # if os.path.isfile(deep_analysis_csv_path):
+    #     df = pd.read_csv(deep_analysis_csv_path)
+    # else:
+    df = pd.DataFrame(columns=['file_name', 'hack title', 'brief summary', 'deep analysis_free', 'deep analysis_premium'])
     
     counter = 0
 
@@ -147,10 +147,10 @@ def analyze_validated_hacks(validation_result_csv: str):
         with open(file_path, 'r') as file:
             text = file.read()
 
-        result, prompt = get_deep_analysis(title, brief_summary, text)
+        result_free, result_premium, prompt_free, prompt_premium = get_deep_analysis(title, brief_summary, text)
         
         new_row_index = len(df)
-        df.loc[new_row_index] = [file_name, title, brief_summary, result]
+        df.loc[new_row_index] = [file_name, title, brief_summary, result_free, result_premium]
         counter += 1
 
         if counter % 10 == 0:
@@ -197,3 +197,4 @@ if __name__ == "__main__":
                     os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7301700833052314922.csv'),
                     os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7329918298571820331.csv')])
     # split_search_results()
+    # analyze_validated_hacks(os.path.join(DATA_DIR, 'validation_result_test.csv'))

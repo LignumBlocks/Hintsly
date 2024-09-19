@@ -1,6 +1,7 @@
 import json
-import load_model
-from settings import PROMPTS_TEMPLATES
+import os
+import llm_models
+from settings import PROMPTS_TEMPLATES, DATA_DIR
 
 def load_prompt(*args):
     """Constructs a prompt from the prompting files in the prompts directory.
@@ -41,7 +42,7 @@ def discriminate_hacks_from_text(source_text: str, source: str):
     # print(prompt)
     # return
     try:
-        model = load_model.LLMmodel("gpt-4o-mini")
+        model = llm_models.LLMmodel("gpt-4o-mini")
         result:str = model.run(prompt, system_prompt)
         cleaned_string = result.replace("```json\n", "").replace("```","")
         # Strip leading and trailing whitespace
@@ -66,24 +67,25 @@ def get_queries_for_validation(hack_title: str, source_text: str, num_queries: i
     system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
     
     try:
-        model = load_model.LLMmodel("gpt-4o-mini")
+        model = llm_models.LLMmodel("gpt-4o-mini")
         result:str = model.run(prompt, system_prompt)
         cleaned_string = result.replace("```json\n", "").replace("```","")
         # Strip leading and trailing whitespace
         cleaned_string = cleaned_string.strip()
         return json.loads(cleaned_string), prompt
     except Exception as er:
-        print(f"Error discriminating hacks: {er}")
+        print(f"Error getting the queries for the hacks: {er}")
         return None, prompt
 
 def validate_financial_hack(hack_source, hack_title: str, hack_summary: str, query_csv_path: str):
     try:
-        model = load_model.LLMmodel("gpt-4o-mini")
-        model.vector_store_from_query_csv(query_csv_path, hack_source)
+        model = llm_models.LLMmodel("gpt-4o-mini")
+        rag = llm_models.RAG_LLMmodel("gpt-4o-mini",chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
+        rag.store_from_query_csv(query_csv_path, hack_source)
         chunks = ""
         metadata = []
         # print(model.vector_store)
-        for result in model.retrieve_similar_chunks(hack_title+ ':\n'+hack_summary):
+        for result in rag.retrieve_similar_for_hack(hack_source, hack_title+ ':\n'+hack_summary):
             print(result.metadata)
             metadata.append((result.metadata['link'], result.metadata['source']))
             chunks += result.page_content + "\n"
@@ -102,19 +104,21 @@ def validate_financial_hack(hack_source, hack_title: str, hack_summary: str, que
             pass
         return json.loads(result), prompt, metadata
     except Exception as er:
-        print(f"Error discriminating hacks: {er}")
+        print(f"Error validating hacks: {er}")
         return None, None, None
 
-
 def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
-    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS'])
-    prompt = prompt_template.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
-    system_prompt = "You are an AI financial analyst tasked to do a deep analysis of a financial hack."
+    prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_FREE'])
+    prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_PREMIUM'])
+    prompt_free = prompt_template_free.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
+    prompt_premium = prompt_template_premium.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
+    system_prompt = "You are a financial analyst specializing in creating financial hacks for users in t"
     
     try:
-        model = load_model.LLMmodel("gpt-4o-mini")
-        result = model.run(prompt, system_prompt)
-        return result, prompt
+        model = llm_models.LLMmodel("gpt-4o-mini")
+        result_free = model.run(prompt_free, system_prompt)
+        result_premium = model.run(prompt_premium, system_prompt)
+        return result_free, result_premium, prompt_free, prompt_premium 
     except Exception as er:
-        print(f"Error discriminating hacks: {er}")
-        return None, prompt
+        print(f"Error in deep_analysis: {er}")
+        return None, prompt_free, prompt_premium
