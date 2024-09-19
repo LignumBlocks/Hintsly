@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import json
 from settings import BASE_DIR, SRC_DIR, DATA_DIR
-from process_and_validate import discriminate_hacks_from_text, get_queries_for_validation, validate_financial_hack
+from process_and_validate import discriminate_hacks_from_text, get_queries_for_validation, validate_financial_hack, get_deep_analysis
 
 def process_transcriptions():
     # data_folder = os.path.join(DATA_DIR, 'Transcriptions Nobudgetbabe')
@@ -65,9 +65,7 @@ def get_queries(csv_path: str):
     counter = 0
 
     for index, row in source_df.iterrows():
-        print(row['hack_status'])
         if not row['hack_status']:
-            print(row['hack_status'])
             continue
         file_name = row['file_name']     
         title = row['title']        
@@ -125,6 +123,42 @@ def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
     # Save any remaining data
     if not df.empty:
         df.to_csv(validation_result_csv_path, index=False)
+        print('Final save: saved remaining files to CSV.')
+
+def analyze_validated_hacks(validation_result_csv: str):
+    validation_df = pd.read_csv(validation_result_csv)
+    deep_analysis_csv_path = os.path.join(DATA_DIR, 'deep_analysis_results_test.csv')
+    data_dir = os.path.join(DATA_DIR, 'test_cases')
+    if os.path.isfile(deep_analysis_csv_path):
+        df = pd.read_csv(deep_analysis_csv_path)
+    else:
+        df = pd.DataFrame(columns=['file_name', 'hack title', 'brief summary', 'deep analysis'])
+    
+    counter = 0
+
+    for index, row in validation_df.iterrows():
+        if row['validation status'] != "Valid":
+            print(row['validation status'])
+            continue
+        file_name = row['file_name']     
+        title = row['title']        
+        brief_summary = row['brief summary'] 
+        file_path = os.path.join(data_dir, file_name+'.txt')
+        with open(file_path, 'r') as file:
+            text = file.read()
+
+        result, prompt = get_deep_analysis(title, brief_summary, text)
+        
+        new_row_index = len(df)
+        df.loc[new_row_index] = [file_name, title, brief_summary, result]
+        counter += 1
+
+        if counter % 10 == 0:
+            df.to_csv(deep_analysis_csv_path, index=False)
+            print(f'Saved {counter} files to CSV.')
+    # Save any remaining data
+    if not df.empty:
+        df.to_csv(deep_analysis_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
 
 def split_search_results():

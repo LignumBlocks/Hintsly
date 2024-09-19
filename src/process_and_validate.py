@@ -52,7 +52,7 @@ def discriminate_hacks_from_text(source_text: str, source: str):
         return None, prompt
     
 def get_queries_for_validation(hack_title: str, source_text: str, num_queries: int=4):
-    """ For a hack summary select validate against real sources.
+    """ For a hack summary select queries to validate against real sources.
     
     Args:
         source_text (str): Text content to analyse.
@@ -76,10 +76,10 @@ def get_queries_for_validation(hack_title: str, source_text: str, num_queries: i
         print(f"Error discriminating hacks: {er}")
         return None, prompt
 
-def validate_financial_hack(hack_title: str, hack_summary: str, query_csv_path: str):
+def validate_financial_hack(hack_source, hack_title: str, hack_summary: str, query_csv_path: str):
     try:
         model = load_model.LLMmodel("gpt-4o-mini")
-        model.vector_store_from_query_csv(query_csv_path)
+        model.vector_store_from_query_csv(query_csv_path, hack_source)
         chunks = ""
         metadata = []
         # print(model.vector_store)
@@ -93,8 +93,28 @@ def validate_financial_hack(hack_title: str, hack_summary: str, query_csv_path: 
         system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
         
         result:str = model.run(prompt, system_prompt)
+        try:
+            cleaned_string = result.replace("```json\n", "").replace("```","")
+            # Strip leading and trailing whitespace
+            cleaned_string = cleaned_string.strip()
+            result = cleaned_string
+        except:
+            pass
         return json.loads(result), prompt, metadata
     except Exception as er:
         print(f"Error discriminating hacks: {er}")
         return None, None, None
 
+
+def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS'])
+    prompt = prompt_template.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
+    system_prompt = "You are an AI financial analyst tasked to do a deep analysis of a financial hack."
+    
+    try:
+        model = load_model.LLMmodel("gpt-4o-mini")
+        result = model.run(prompt, system_prompt)
+        return result, prompt
+    except Exception as er:
+        print(f"Error discriminating hacks: {er}")
+        return None, prompt
