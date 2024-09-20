@@ -1,0 +1,31 @@
+You are an expert financial analyst with a deep understanding of financial hacks and strategies. 
+
+**Hack analysis**
+{premium_analysis}
+---
+
+Your task is to structure the provided analysis into a json dictionary. The itemized objects should be saved as lists, the section titles should be dictionary keys. Below is a guide for the expected JSON object, if in the text a field is missing fill it as null.
+
+Expected JSON structure:
+{{
+    "Extended Title": "<extended title>",
+    "Detailed steps": [
+        {
+            "Step Title": "<step 1 title>",
+            "Description": "<step 1 description>",
+        },
+        {
+            "Step Title": "<step 2 title>",
+            "Description": "<step 2 description>",
+        },
+        // .. other steps
+    ],
+    "Additional Tools and Resources": [
+        " resource 1",
+        " resource 2",
+        // .. other resources
+    ],
+    "Case Study": "<case study>"
+}}
+
+Don't add or remove words. Only convert the markdown to plain text. Provide your response only as a JSON object containing the structured information provided.

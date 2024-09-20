@@ -16,4 +16,6 @@ PROMPTS_TEMPLATES = {
     'DEEP_ANALYSIS':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis"),
     'DEEP_ANALYSIS_FREE':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis_free"),
     'DEEP_ANALYSIS_PREMIUM':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis_premium"),
-    }
+    'STRCT_DEEP_ANALYSIS_FREE':os.path.join(PROMPT_DIR, "extended_description", "structure_free"),
+    'STRCT_DEEP_ANALYSIS_PREMIUM':os.path.join(PROMPT_DIR, "extended_description", "structure_premium"),
+}

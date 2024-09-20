@@ -9,37 +9,30 @@ You are an expert financial analyst with a deep understanding of financial hacks
 **Source Text of the Hack**:
 {original_text}
 ---
+**Simplified analysis**
+{free_analysis}
+---
 
 Your task is to provide a comprehensive analysis of the financial hack described above, adhering to the following guidelines:
 
-1. **Hack Title**:
-   - Provide an extended version of the original title to reflect the in-depth content.
+1. Extended Title:
+   - Provide an extended version of the title in the `Simplified analysis` to reflect the in-depth content.
 
-2. **Description**:
-   - Summarize the hack's concept and benefits in 2-3 sentences. Highlight how the hack improves the user's financial situation or habits.
-
-3. **Main Goal**:
-   - Clearly state the hack's primary purpose in one sentence.
-
-4. **Financial Category/Vehicle**:
-   - Identify the specific financial category this hack falls into (e.g., Debt Management, Savings, Budgeting, etc.).
-
-5. **Detailed Steps for Implementation**:
-   - Offer an extended breakdown of 3-5 actionable steps for the user to implement the hack. Include additional details and context to optimize the hack.
+2. Detailed Steps for Implementation:
+   - Offer an extended breakdown of each step listed in the `Simplified analysis`, including additional details and context to optimize the hack.
    - Ensure the steps are clear for any user to follow without advanced knowledge.
    - Include personalized tips, tricks, and insights to help the users tailor the strategy to their personal finances.
    - Explain advanced considerations that could help users maximize the hack.
 
-6. **Resources Needed**:
-   - Suggest advanced apps, bank accounts necessary to implement the strategy effectively.
+3. Additional Tools and Resources:
+   - Suggest advanced apps, bank accounts that users can use to enhance the strategy.
    - Provide recommendations for tools that offer more complex tracking, customization, or integration with other financial plans (e.g., debt payoff calculators, investment tools, detailed budgeting systems).
 
-7. **Expected Benefits**:
-   - Briefly outline the financial or psychological benefits of applying the hack (e.g., improved savings discipline, accelerated debt payoff, reduced stress, etc.).
-
-6. **Case Study Outline**:
+4. Case Study Outline:
    - Provide a brief outline for a realistic case study that demonstrates how a hypothetical user applies the hack and benefits from it.
    - Include placeholders for names, specific financial figures, and personal details, so it can be easily adapted.
-   - Example: Sarah has $10,000 in debt across 3 credit cards. By using the Snowball method, she pays off her smallest debt in 6 months and saves $800 in interest. Outline how each step of the hack impacted her financial outcome.
+   - *Criteria for including case studies*:
+     - Complex or high-impact hacks.
+     - Diverse situations to reflect different financial scenarios.
 
-Your Analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications.
+Your Analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications. Only answer about the indications in the guideline. Adapt examples and terminology to the user's region or state within the USA. Align with current laws and regulations in the USA and specific states. 

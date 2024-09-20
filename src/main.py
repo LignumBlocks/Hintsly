@@ -2,9 +2,10 @@ import os
 import pandas as pd
 import json
 from settings import BASE_DIR, SRC_DIR, DATA_DIR
-from process_and_validate import discriminate_hacks_from_text, get_queries_for_validation, validate_financial_hack, get_deep_analysis
+from process_and_validate import discriminate_hacks_from_text, get_queries_for_validation, validate_financial_hack, get_deep_analysis, get_structured_analysis
+from process_from_db import validate_hacks
 
-def process_transcriptions():
+def process_transcriptions_from_csv():
     # data_folder = os.path.join(DATA_DIR, 'Transcriptions Nobudgetbabe')
     # hacks_discrimination_csv_path = os.path.join(DATA_DIR, 'hacks_discrimination.csv')
     data_folder = os.path.join(DATA_DIR, 'test_cases')
@@ -54,7 +55,7 @@ def process_transcriptions():
         hacks_discrimination.to_csv(hacks_discrimination_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
 
-def get_queries(csv_path: str):
+def get_queries_from_csv(csv_path: str):
     source_df = pd.read_csv(csv_path)
     validation_result_csv_path = os.path.join(DATA_DIR, 'validation_queries_test.csv')
     if os.path.isfile(validation_result_csv_path):
@@ -85,7 +86,7 @@ def get_queries(csv_path: str):
         df.to_csv(validation_result_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
 
-def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
+def validate_hacks_from_csv(hacks_queries_csv_path: str, validation_sources_csvs: list):
     def get_clean_links(metadata):
         links = [item[0] for item in metadata]
         unique_links = set(links)
@@ -125,15 +126,17 @@ def validate_hacks(hacks_queries_csv_path: str, validation_sources_csvs: list):
         df.to_csv(validation_result_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
 
-def analyze_validated_hacks(validation_result_csv: str):
+def analyze_validated_hacks_from_csv(validation_result_csv: str):
     validation_df = pd.read_csv(validation_result_csv)
     deep_analysis_csv_path = os.path.join(DATA_DIR, 'deep_analysis_results_test.csv')
+    structured_deep_analysis_csv_path = os.path.join(DATA_DIR, 'structured_deep_analysis_results_test.csv')
     data_dir = os.path.join(DATA_DIR, 'test_cases')
     # if os.path.isfile(deep_analysis_csv_path):
     #     df = pd.read_csv(deep_analysis_csv_path)
     # else:
     df = pd.DataFrame(columns=['file_name', 'hack title', 'brief summary', 'deep analysis_free', 'deep analysis_premium'])
-    
+    structured_df = pd.DataFrame()
+
     counter = 0
 
     for index, row in validation_df.iterrows():
@@ -148,17 +151,31 @@ def analyze_validated_hacks(validation_result_csv: str):
             text = file.read()
 
         result_free, result_premium, prompt_free, prompt_premium = get_deep_analysis(title, brief_summary, text)
-        
+        structured_free, structured_premium, _, _ = get_structured_analysis(result_free, result_premium)
+        json_structured_free = json.loads(structured_free)
+        json_structured_premium = json.loads(structured_premium)
+        combined_data = {**json_structured_free, **json_structured_premium}
+        print('combined_data', combined_data)
+
         new_row_index = len(df)
         df.loc[new_row_index] = [file_name, title, brief_summary, result_free, result_premium]
+        
+        # df_row = pd.DataFrame([combined_data]).transpose().reset_index()
+        # df_row.columns = ['Column', 'Value']
+        structured_df.append(combined_data, ignore_index=True)
+        print('structured_df', structured_df)
+        # structured_df = pd.concat([structured_df, df_row], ignore_index=True)
         counter += 1
 
         if counter % 10 == 0:
             df.to_csv(deep_analysis_csv_path, index=False)
+            structured_df.to_csv(structured_deep_analysis_csv_path, index=False)
             print(f'Saved {counter} files to CSV.')
     # Save any remaining data
     if not df.empty:
         df.to_csv(deep_analysis_csv_path, index=False)
+        structured_df = structured_df.pivot(index=None, columns='Column', values='Value')
+        structured_df.to_csv(structured_deep_analysis_csv_path, index=False)
         print('Final save: saved remaining files to CSV.')
 
 def split_search_results():
@@ -190,11 +207,12 @@ if __name__ == "__main__":
     # sorted_df.to_csv(os.path.join(DATA_DIR, 'hacks_discrimination.csv'), index=False) 
     # process_transcriptions()
     # get_queries(os.path.join(DATA_DIR, 'hacks_discrimination_tests.csv'))
-    validate_hacks(os.path.join(DATA_DIR, 'validation_queries_test.csv'),
-                   [os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv'),
-                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv'),
-                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7287292622924893486.csv'),
-                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7301700833052314922.csv'),
-                    os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7329918298571820331.csv')])
+    # validate_hacks_from_csv(os.path.join(DATA_DIR, 'validation_queries_test.csv'),
+    #                [os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv'),
+    #                 os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7286913008788426027.csv'),
+    #                 os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7287292622924893486.csv'),
+    #                 os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7301700833052314922.csv'),
+    #                 os.path.join(DATA_DIR, 'validation','sources_for_validation_@hermoneymastery_video_7329918298571820331.csv')])
+    # validate_hacks(os.path.join(DATA_DIR, 'validation_queries_test.csv'))
     # split_search_results()
-    # analyze_validated_hacks(os.path.join(DATA_DIR, 'validation_result_test.csv'))
+    analyze_validated_hacks_from_csv(os.path.join(DATA_DIR, 'validation_result_test1.csv'))
