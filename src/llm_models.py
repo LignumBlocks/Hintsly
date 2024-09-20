@@ -2,6 +2,7 @@ import os
 from langchain_openai import OpenAIEmbeddings, OpenAI, ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_chroma import Chroma
+from langchain.chains import RetrievalQA
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.prompts import PromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, SystemMessage, trim_messages
@@ -12,6 +13,7 @@ from langchain_core.runnables import RunnablePassthrough
 from operator import itemgetter
 from langchain import hub
 import uuid
+from datetime import datetime, timezone
 import pandas as pd
 import json
 from dotenv import load_dotenv
@@ -96,50 +98,106 @@ class LLMmodel:
         response = self.llm_w_history.invoke([HumanMessage(content=input)], config=config)
         print("History chat response :", response.content)
         return response.content
+   
 
-    def simple_rag(docs):
+class RAG_LLMmodel:
+    def __init__(self, model_name: str = "gemini-1.5-flash", temperature: float = 0.4, chroma_path='chroma_db',collection_name='validation'):
+        self.model_name = model_name if model_name else models[0]
+        self.temperature = temperature  # The temperature use for sampling, higher temperature will result in more creative and imaginative text, while lower temperature will result in more accurate and factual text.
+        if 'gpt' in model_name:
+            self.llm = ChatOpenAI(model=self.model_name)
+        else:
+            self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash",
+                                              cache=False, temperature=temperature)
+        self.chroma_path = chroma_path
+        self.embeddings = OpenAIEmbeddings() # TODO generalize like self.llm
+        self.vectorstore = self.load_or_create_chroma(collection_name)
+        # self.vectorstore.persist()
+        # https://python.langchain.com/api_reference/chroma/vectorstores/langchain_chroma.vectorstores.Chroma.html
+        # prompt = hub.pull("rlm/rag-prompt")
+        # self.qa_chain = RetrievalQA.from_llm(
+        #     self.llm, retriever=retriever, prompt=prompt
+        # )
+        # response = self.qa_chain.run(text_to_compare)
+
+    def load_or_create_chroma(self, collection_name):
+        """Loads existing Chroma store or creates a new one if it doesn't exist."""
+        try:
+            return Chroma(collection_name=collection_name,persist_directory=self.chroma_path, embedding_function=self.embeddings)
+        except FileNotFoundError:
+            return Chroma.from_documents([], self.embeddings, persist_directory=self.chroma_path)
+
+    def add_document(self, hack_id, document_title, documents, metadata):
+        """Adds a new document to the Chroma vector store only if it doesn't exist."""
+        # Check if document already exists for the hack
+        existing_documents = self.vectorstore.get()
+            # where={"hack_id": hack_id, "title": document_title})
+        filtered_documents = [doc for doc in existing_documents['metadatas'] if (doc["hack_id"] == hack_id and doc["title"] == document_title)]
+
+        # print(f'existing_documents for {hack_id}', len(filtered_documents), documents[0])
+        # Add to Chroma vector store
+        if len(filtered_documents) == 0:
+            self.vectorstore.add_texts(documents, metadatas=metadata)
+        # self.vectorstore.persist()
+
+    def query_for_hack(self, hack_id, text_to_compare):
+        retriever = self.vectorstore.as_retriever(
+            filter={"hack_id": hack_id}
+        )
+        prompt = hub.pull("rlm/rag-prompt")
+        self.qa_chain = RetrievalQA.from_llm(
+            self.llm, retriever=retriever, prompt=prompt
+        )
+        response = self.qa_chain.run(text_to_compare)
+
+    def retrieve_similar_for_hack(self, hack_id, text_to_compare, k=4):
+        """Retrieves the top k most similar documents to the given text."""
+        similar_documents = self.vectorstore.similarity_search(query=text_to_compare,k=k,filter={"hack_id": hack_id})
+        # retriever = self.vectorstore.as_retriever(
+        #     filter={"hack_id": hack_id}
+        # )
+        # similar_documents = retriever.get_relevant_documents(text_to_compare, k=k)
+        return similar_documents
+
+    def simple_rag(self, docs):
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         splits = text_splitter.split_documents(docs)
         vectorstore = Chroma.from_documents(documents=splits, embedding=OpenAIEmbeddings())
+        return vectorstore
 
     def retrieve_similar_chunks(self, query):
         results = self.vector_store.similarity_search(query, k=4)
         return results
     
-    def vector_store_from_query_csv(self, csv_path: str, sourcename):
-        persist_directory = os.path.join(DATA_DIR, "chroma_langchain_db")
-        embeddings = OpenAIEmbeddings()
+    def store_from_query_csv(self, query_df: str, hack_source):
+        
         # if os.path.isdir(persist_directory):
         #     print('loading from persist directory')
         #     self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
         #     print('vectore_store ready')
         #     return self.vector_store
-        df = pd.read_csv(csv_path)
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=300)
         
-        documents = []
-        metadatas = []
-        for index, row in df.iterrows():
+        for index, row in query_df.iterrows():
             if not pd.isna(row['content']) and row['content'] != '' and row['content'] != 'Error al cargar el contenido':
+                documents = []
+                metadatas = []
                 content_chunks = text_splitter.split_text(row['content'])
                 for chunk in content_chunks:
                     documents.append(chunk)
                     metadatas.append({
+                        "hack_id": hack_source,
                         "query": row['query'],
                         "source": row['source'],
                         "title": row['title'],
                         "description": row['description'],
                         "link": row['link']
                     })
+                self.add_document(hack_source, row['title'], documents, metadatas)
                     # print(documents[-1])
                     # print(metadatas[-1])
-        data = { "documents": documents, "metadatas": metadatas }
+        # data = { "documents": documents, "metadatas": metadatas }
 
-        with open('data.json', 'w') as json_file:
-            json.dump(data, json_file)
+        # with open('data.json', 'w') as json_file:
+        #     json.dump(data, json_file)
 
-        self.vector_store = Chroma.from_texts(documents, embeddings, metadatas=metadatas, persist_directory=persist_directory,
-                                            collection_name="hermoneymastery_video_7286913008788426027")
-        
-        print('vectore_store ready')
-        return self.vector_store
