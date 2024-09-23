@@ -18,4 +18,6 @@ PROMPTS_TEMPLATES = {
     'DEEP_ANALYSIS_PREMIUM':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis_premium"),
     'STRCT_DEEP_ANALYSIS_FREE':os.path.join(PROMPT_DIR, "extended_description", "structure_free"),
     'STRCT_DEEP_ANALYSIS_PREMIUM':os.path.join(PROMPT_DIR, "extended_description", "structure_premium"),
+    'COMPLEXITY_TAG':os.path.join(PROMPT_DIR, "tagging", "complexity"),
+    'CLASIFICATION_TAGS':os.path.join(PROMPT_DIR, "tagging", "hack_classification"),
 }

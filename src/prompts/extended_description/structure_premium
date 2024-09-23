@@ -10,14 +10,14 @@ Expected JSON structure:
 {{
     "Extended Title": "<extended title>",
     "Detailed steps": [
-        {
+        {{
             "Step Title": "<step 1 title>",
             "Description": "<step 1 description>",
-        },
-        {
+        }},
+        {{
             "Step Title": "<step 2 title>",
             "Description": "<step 2 description>",
-        },
+        }},
         // .. other steps
     ],
     "Additional Tools and Resources": [

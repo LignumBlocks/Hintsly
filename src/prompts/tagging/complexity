@@ -1,0 +1,27 @@
+Classify the financial hack into one of the following categories, based on its complexity, accessibility, and level of financial impact:
+
+1. *Accessible*:
+   - *Description*: Simple hacks that are easy to implement by most people without requiring extensive financial knowledge or initial investment. Designed for users with any level of income and experience.
+   - *Examples*: Saving small amounts regularly, reducing non-essential expenses.
+
+2. *Intermediate*:
+   - *Description*: Hacks that require some planning, basic financial knowledge, or a moderate initial investment. Useful for people with medium incomes or some experience in managing their money.
+   - *Examples*: Investing while carrying debt, simple retirement planning strategies.
+
+3. *Advanced*:
+   - *Description*: More complex hacks requiring advanced financial knowledge or considerable resources. Often involve tax strategies, investment in complex assets, or sophisticated legal structures.
+   - *Examples*: Utilizing REITs and advanced tax strategies to maximize returns.
+
+## Financial hack:
+---
+{hack_description}
+---
+
+Provide your response only as a JSON object with the values as plain strings, no markdown; in the following format:
+
+{{
+"complexity": {{
+        "classification": "<Accessible, Intermediate or Advanced>",
+        "explanation": "<A short explanation regarding the classification>",
+    }},
+}}

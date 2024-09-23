@@ -111,12 +111,12 @@ def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
     prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_FREE'])
     prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_PREMIUM'])
     prompt_free = prompt_template_free.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
-    prompt_premium = prompt_template_premium.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
     system_prompt = "You are a financial analyst specializing in creating financial hacks for users in the USA"
     
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
         result_free = model.run(prompt_free, system_prompt)
+        prompt_premium = prompt_template_premium.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text,free_analysis=result_free)
         result_premium = model.run(prompt_premium, system_prompt)
         return result_free, result_premium, prompt_free, prompt_premium 
     except Exception as er:
@@ -152,3 +152,34 @@ def get_structured_analysis(result_free: str, result_premium: str):
     except Exception as er:
         print(f"Error in deep_analysis: {er}")
         return None, None, prompt_free, prompt_premium
+
+def get_hack_classifications(result_free: str):
+    prompt_template_complexity:str = load_prompt(PROMPTS_TEMPLATES['COMPLEXITY_TAG'])
+    prompt_template_categories:str = load_prompt(PROMPTS_TEMPLATES['CLASIFICATION_TAGS'])
+    prompt_complexity = prompt_template_complexity.format(hack_description=result_free)
+    prompt_categories = prompt_template_categories.format(hack_description=result_free)
+    system_prompt = "You are a financial analyst specializing in creating financial hacks for users in the USA"
+    
+    try:
+        model = llm_models.LLMmodel("gpt-4o-mini")
+        result_complexity = model.run(prompt_complexity, system_prompt)
+        result_categories = model.run(prompt_categories, system_prompt)
+        try:
+            cleaned_string = result_complexity.replace("```json\n", "").replace("```","")
+            # Strip leading and trailing whitespace
+            cleaned_string = cleaned_string.strip()
+            result_complexity = cleaned_string
+        except:
+            pass
+        try:
+            cleaned_string = result_categories.replace("```json\n", "").replace("```","")
+            # Strip leading and trailing whitespace
+            cleaned_string = cleaned_string.strip()
+            result_categories = cleaned_string
+        except:
+            pass
+        return result_complexity, result_categories, prompt_complexity, prompt_categories 
+    except Exception as er:
+        print(f"Error in deep_analysis: {er}")
+        return None, None, prompt_complexity, prompt_categories
+

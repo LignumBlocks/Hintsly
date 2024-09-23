@@ -1,47 +1,46 @@
-Bellow you will be provided with a financial hack description. According to this weighting criteria classify and score the financial advice based on its usefulness, complexity, and uniqueness.
+Bellow you will be provided with a financial hack. According to the following financial categories state the applicable tags to the provided information.
 
-## Criteria for Weighting:
+## Financial categories
 
-- Usefulness: How actionable and impactful is the advice for someone’s financial life?
-  * High Usefulness: Advice that can lead to significant financial changes (e.g., specific investment strategies, tax-saving techniques).
-  * Low Usefulness: General advice or motivational tips (e.g., “Start saving early,” “Avoid debt”).
-- Complexity: How complex is the advice in terms of execution?
-  * High Complexity: Requires in-depth understanding or effort to implement (e.g., creating a diversified investment portfolio, setting up a trust).
-  * Low Complexity: Simple, well-known tips (e.g., “Reduce discretionary spending,” “Create a budget”).
-- Uniqueness: Is the advice widely available/common knowledge, or is it something relatively new or not often discussed?
-  * Unique: Strategies not commonly discussed or niche topics (e.g., advanced tax strategies, using balance transfer cards for debt).
-  * Common: Basic financial principles that most people know (e.g., “Compound interest is powerful,” “Start investing early”).
+- `Corporate Finance`: financial activities of corporations, including investment decisions, financial management, and capital structure.
+- `Investment Management`: strategies and practices of managing financial assets to maximize returns.
+- `Personal Finance`: management of individual or household financial activities, including budgeting, saving, and investing.
+- `Financial Markets`:  facilitate the trading of financial instruments and play a key role in the allocation of resources. Including stock market, bond market and derivative market.
+- `Public Finance`: studies the role of the government in the economy, including taxation, spending, and debt management.
+- `Banking and Financial Institutions`: examines banking systems and financial institutions that provide financial services to individuals and businesses.
+- `Risk Management`: identifies, assesses, and prioritizes risks followed by coordinated efforts to minimize or control their impact.
+- `International Finance`: focuses on the financial interactions between countries, including currency exchange, investments, and regulations.
+- `Financial Planning and Analysis`: managing a company's financial health through analysis and strategic planning.
+- `Fintech and Emerging Technologies`: innovative technologies and their impact on the financial industry.
+- `Behavioral Finance`: investigates the psychological factors influencing investors' decisions and market dynamics.
 
-## Score Assignment:
-
-• Usefulness: 1 = Not useful, 5 = Highly useful.
-• Complexity: 1 = Very simple, 5 = Highly complex.
-• Uniqueness: 1 = Common knowledge, 5 = Rare or unique insight.
-
-## Financial hack description:
+## Financial hack:
 ---
 {hack_description}
 ---
 
-Analize the previous content and assign a classification for each category (usefulness, complexity, and uniqueness). Also assign a score based on the classification.
+If there is more than one category fitting then return them all. Provide your response only as a JSON object, in the following format:
 
-The output must be a json with the following structure:
+Example for more than one tag:
 ```json
-{{
-    "usefulness": {{
-        "classification": "<High Usefulness or Low Usefulness>",
-        "explanation": "<A short explanation regarding the classification>",
-        "score": "<score from 1 to 5>",
-    }},
-    "complexity": {{
-        "classification": "<High Complexity or Low Complexity>",
-        "explanation": "<A short explanation regarding the classification>",
-        "score": "<score from 1 to 5>",
-    }},
-    "uniqueness": {{
-        "classification": "<Unique or Common>",
-        "explanation": "<A short explanation regarding the classification>",
-        "score": "<score from 1 to 5>",
-    }},
-}}
+[
+  {{
+    "category": "<category with the same name as it was listed>",
+    "breve explanation": "<A short explanation regarding the classification>"
+  }},
+  {{
+    "category": "<category with the same name as it was listed>",
+    "breve explanation": "<A short explanation regarding the classification>"
+  }},
+  // ...
+]
+```
+Example for one tag:
+```json
+[
+  {{
+    "category": "<category with the same name as it was listed>",
+    "breve explanation": "<A short explanation regarding the classification>"
+  }}
+]
 ```

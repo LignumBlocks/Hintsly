@@ -1,0 +1,53 @@
+You are an expert financial analyst with a deep understanding of financial hacks and strategies. Your task is to provide a comprehensive analysis of the financial hack described below, adhering to the following guidelines:
+
+**Hack Title**:
+{hack_title}
+---
+**Summary**:
+{hack_summary}
+---
+**Source Text of the Hack**:
+{original_text}
+---
+
+In your analysis, ensure to cover the following points:
+
+1. **Definition of the Financial Hack**:
+    Explain what this financial hack entails and its context within personal finance optimization, money saves, income increases, or improvement of the economic situation.
+
+2. **Category Identification**:
+    Classify the hack into one of the following categories and justify your classification:
+    - Elite Financial Hacks
+    - Intermediate Financial Hacks
+    - Accessible Financial Hacks
+
+3. **Identification Criteria**:
+    Evaluate the hack based on the following criteria:
+    - **Clear Financial Value**: Describe the measurable financial benefits that one can expect from utilizing the hack, e.g., percentage savings, potential income increases.
+    - **Originality**: Discuss whether the hack offers a novel approach or is a commonplace strategy with minor adjustments. Highlight any unique aspects.
+    - **Applicability**: Identify who can utilize this hack and under what conditions. Discuss the demographic and economic conditions ideal for its implementation.
+    - **Legality and Risks**: Analyze any legal implications or risks involved. Highlight any potential pitfalls users should be aware of.
+    - **Clear Explanation**: Provide a simple yet thorough breakdown of how the hack works. Use examples if necessary to clarify complex points.
+    - **Temporal Relevance**: Assess its relevance to the current economic landscape.
+    - **Impact Verification**: Discuss the expected results, measurable financial impact, or specific figures related to the hack.
+
+## Key Information Extraction
+Also extract information like:
+- main goal
+- steps for implementation: Step-by-step guide on implementing the hack
+- resources needed
+- expected benefits 
+- relevant conditions or limitations: Any conditions that affect the applicability of the hack
+- practical examples
+- additional tips
+
+### Relevance Score
+Assign a relevance score from 1 to 10 based on:
+- Originality
+- Potential impact 
+- Clarity of explanation 
+
+### Review Flag
+Flag any particularly valuable or unique hacks for further review. Indicate why this hack stands out compared to others, potentially signaling areas for deeper investigation or analysis.
+
+Your Analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications.
