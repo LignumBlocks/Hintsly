@@ -8,9 +8,9 @@ PROMPT_DIR = os.path.join(SRC_DIR, 'prompts')
 
 # prompts
 PROMPTS_TEMPLATES = {
-    'HACK_DISCRIMINATION0':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination"),
-    'HACK_DISCRIMINATION1':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_medium"),
-    'HACK_DISCRIMINATION2':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_reduced"),
+    'HACK_VERIFICATION0':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination"),
+    'HACK_VERIFICATION1':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_medium"),
+    'HACK_VERIFICATION2':os.path.join(PROMPT_DIR, "ishack", "hack_discrimination_reduced"),
     'GET_QUERIES':os.path.join(PROMPT_DIR, "validation", "generate_questions"),
     'VALIDATE_HACK':os.path.join(PROMPT_DIR, "validation", "rag_to evaluate"),
     'DEEP_ANALYSIS':os.path.join(PROMPT_DIR, "extended_description", "deep_analysis"),

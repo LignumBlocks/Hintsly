@@ -7,7 +7,7 @@ When scanning content, prioritize hacks that meet the following criteria:
 - Clear Explanation: Prioritize hacks offering detailed explanations.
 - Impact Verification: Look for indications of measurable financial impact: specific figures or expected results.
 
-Analize the following content for financial hacks. This is a text extraction of a {source}:
+Analize the following content for financial hacks:
 ---
 {source_text}
 ---

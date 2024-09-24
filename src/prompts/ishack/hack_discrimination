@@ -11,7 +11,7 @@ When scanning content, prioritize hacks that meet the following criteria:
 - Temporal Relevance: Must be suitable for the current economic context. Look for mentions of temporality or economic conditions in which the hack works. Key phrases: "relevant now," "applicable in [current year]," "long-term/short-term strategy".
 - Impact Verification: Look for indications of measurable financial impact: specific figures or expected results.
 
-Analize the following content for financial hacks. This is a text extraction of a {source}:
+Analize the following content for financial hacks:
 ---
 {source_text}
 ---

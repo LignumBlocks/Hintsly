@@ -24,7 +24,7 @@ def load_prompt(*args):
 #     is_a_hack: bool = Field(description="Whether the content include a valid financial hack")
 
 
-def discriminate_hacks_from_text(source_text: str, source: str):
+def verify_hacks_from_text(source_text: str):
     """ Determine whether the text constitutes a hack or not, returning structured JSON style.
     
     Args:
@@ -36,8 +36,8 @@ def discriminate_hacks_from_text(source_text: str, source: str):
                 "is_a_hack": "<true or false>" 
             }`
     """
-    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_DISCRIMINATION2'])
-    prompt = prompt_template.format(source_text=source_text, source=source)
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_VERIFICATION2'])
+    prompt = prompt_template.format(source_text=source_text)
     system_prompt = "You are an AI financial analyst tasked with classifying content related to financial strategies."
     # print(prompt)
     # return
@@ -49,7 +49,7 @@ def discriminate_hacks_from_text(source_text: str, source: str):
         cleaned_string = cleaned_string.strip()
         return json.loads(cleaned_string), prompt
     except Exception as er:
-        print(f"Error discriminating hacks: {er}")
+        print(f"Error in verify hacks: {er}")
         return None, prompt
     
 def get_queries_for_validation(hack_title: str, source_text: str, num_queries: int=4):
@@ -148,7 +148,7 @@ def get_structured_analysis(result_free: str, result_premium: str):
             result_premium = cleaned_string
         except:
             pass
-        return result_free, result_premium, prompt_free, prompt_premium 
+        return json.loads(result_free), json.loads(result_premium), prompt_free, prompt_premium 
     except Exception as er:
         print(f"Error in deep_analysis: {er}")
         return None, None, prompt_free, prompt_premium
@@ -178,7 +178,7 @@ def get_hack_classifications(result_free: str):
             result_categories = cleaned_string
         except:
             pass
-        return result_complexity, result_categories, prompt_complexity, prompt_categories 
+        return json.loads(result_complexity), json.loads(result_categories), prompt_complexity, prompt_categories 
     except Exception as er:
         print(f"Error in deep_analysis: {er}")
         return None, None, prompt_complexity, prompt_categories
