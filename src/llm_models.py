@@ -169,7 +169,7 @@ class RAG_LLMmodel:
         results = self.vector_store.similarity_search(query, k=4)
         return results
     
-    def store_from_query_csv(self, query_df: str, hack_source):
+    def store_from_query_csv(self, queries_dict: list, hack_id):
         
         # if os.path.isdir(persist_directory):
         #     print('loading from persist directory')
@@ -178,22 +178,22 @@ class RAG_LLMmodel:
         #     return self.vector_store
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=300)
         
-        for index, row in query_df.iterrows():
-            if not pd.isna(row['content']) and row['content'] != '' and row['content'] != 'Error al cargar el contenido':
+        for query_dict in queries_dict:
+            if query_dict['content'] != '' and query_dict['content'] != 'Error al cargar el contenido':
                 documents = []
                 metadatas = []
-                content_chunks = text_splitter.split_text(row['content'])
+                content_chunks = text_splitter.split_text(query_dict['content'])
                 for chunk in content_chunks:
                     documents.append(chunk)
                     metadatas.append({
-                        "hack_id": hack_source,
-                        "query": row['query'],
-                        "source": row['source'],
-                        "title": row['title'],
-                        "description": row['description'],
-                        "link": row['link']
+                        "hack_id": hack_id,
+                        "query": query_dict['query'],
+                        "source": query_dict['source'],
+                        "title": query_dict['title'],
+                        "description": query_dict['description'],
+                        "link": query_dict['link']
                     })
-                self.add_document(hack_source, row['title'], documents, metadatas)
+                self.add_document(hack_id, query_dict['title'], documents, metadatas)
                     # print(documents[-1])
                     # print(metadatas[-1])
         # data = { "documents": documents, "metadatas": metadatas }

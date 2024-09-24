@@ -77,15 +77,15 @@ def get_queries_for_validation(hack_title: str, source_text: str, num_queries: i
         print(f"Error getting the queries for the hacks: {er}")
         return None, prompt
 
-def validate_financial_hack(hack_source, hack_title: str, hack_summary: str, query_df: str):
+def validate_financial_hack(hack_id, hack_title: str, hack_summary: str, queries_dict: list):
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
         rag = llm_models.RAG_LLMmodel("gpt-4o-mini",chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
-        rag.store_from_query_csv(query_df, hack_source)
+        rag.store_from_query_csv(queries_dict, hack_id)
         chunks = ""
         metadata = []
         # print(model.vector_store)
-        for result in rag.retrieve_similar_for_hack(hack_source, hack_title+ ':\n'+hack_summary):
+        for result in rag.retrieve_similar_for_hack(hack_id, hack_title+ ':\n'+hack_summary):
             print(result.metadata)
             metadata.append((result.metadata['link'], result.metadata['source']))
             chunks += result.page_content + "\n"
