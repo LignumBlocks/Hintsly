@@ -110,7 +110,7 @@ class RAG_LLMmodel:
             self.llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash",
                                               cache=False, temperature=temperature)
         self.chroma_path = chroma_path
-        self.embeddings = OpenAIEmbeddings() # TODO generalize like self.llm
+        self.embeddings = OpenAIEmbeddings(model="text-embedding-3-small") # TODO generalize like self.llm
         self.vectorstore = self.load_or_create_chroma(collection_name)
         # self.vectorstore.persist()
         # https://python.langchain.com/api_reference/chroma/vectorstores/langchain_chroma.vectorstores.Chroma.html
@@ -176,7 +176,7 @@ class RAG_LLMmodel:
         #     self.vector_store = Chroma(persist_directory=persist_directory, embedding_function=embeddings)
         #     print('vectore_store ready')
         #     return self.vector_store
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=4000, chunk_overlap=300)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=500)
         
         for query_dict in queries_dict:
             if query_dict['content'] != '' and query_dict['content'] != 'Error al cargar el contenido':

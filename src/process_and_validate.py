@@ -80,7 +80,7 @@ def get_queries_for_validation(hack_title: str, source_text: str, num_queries: i
 def validate_financial_hack(hack_id, hack_title: str, hack_summary: str, queries_dict: list):
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
-        rag = llm_models.RAG_LLMmodel("gpt-4o-mini",chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
+        rag = llm_models.RAG_LLMmodel("gpt-4o-mini", chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
         rag.store_from_query_csv(queries_dict, hack_id)
         chunks = ""
         metadata = []
@@ -111,7 +111,7 @@ def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
     prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_FREE'])
     prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_PREMIUM'])
     prompt_free = prompt_template_free.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
-    system_prompt = "You are a financial analyst specializing in creating financial hacks for users in the USA"
+    system_prompt = "You are a financial analyst specializing in creating financial hacks for users in the USA."
     
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
@@ -121,7 +121,25 @@ def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
         return result_free, result_premium, prompt_free, prompt_premium 
     except Exception as er:
         print(f"Error in deep_analysis: {er}")
-        return None, None, prompt_free, prompt_premium
+        return None, None, None, None
+
+def enriched_analysis(free_description, premium_description, chunks):
+    try:
+        model = llm_models.LLMmodel("gpt-4o-mini")
+
+        prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['ENRICHED_ANALYSIS_FREE'])
+        prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['ENRICHED_ANALYSIS_FREE'])
+        free_prompt = prompt_template_free.format(chunks=chunks, previous_analysis=free_description)
+        system_prompt = "You are a financial analyst specializing in creating financial hacks for users in the USA."
+        
+        result_free = model.run(free_prompt, system_prompt)
+        premium_prompt = prompt_template_premium.format(chunks=chunks, free_analysis=result_free, previous_analysis=premium_description)
+        result_premium = model.run(premium_prompt, system_prompt)
+        
+        return result_free, result_premium, free_prompt, premium_prompt 
+    except Exception as er:
+        print(f"Error deepening hacks descriptions: {er}")
+        return None, None, None
 
 def get_structured_analysis(result_free: str, result_premium: str):
     prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['STRCT_DEEP_ANALYSIS_FREE'])
@@ -182,4 +200,3 @@ def get_hack_classifications(result_free: str):
     except Exception as er:
         print(f"Error in deep_analysis: {er}")
         return None, None, prompt_complexity, prompt_categories
-

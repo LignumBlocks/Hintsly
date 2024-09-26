@@ -1,8 +1,10 @@
+import pandas as pd
+import random
 from handle_db import *
 from process_and_validate import (verify_hacks_from_text, get_queries_for_validation, validate_financial_hack, 
-                                  get_deep_analysis, get_structured_analysis, get_hack_classifications)
-import pandas as pd
+                                  get_deep_analysis, enriched_analysis, get_structured_analysis, get_hack_classifications)
 from settings import BASE_DIR, SRC_DIR, DATA_DIR
+import llm_models
 
 def hacks_verification():
     # Get all transcriptions that haven't been processed
@@ -208,7 +210,7 @@ def analyze_validated_hacks():
         );"""
     unanalized_hacks, _ = read_from_postgres(unanalized_hacks_query)
     
-    for hack in unanalized_hacks:
+    for hack in [1]:
         hack_id = hack[0]
         title = hack[1]
         summary = hack[2]
@@ -217,13 +219,16 @@ def analyze_validated_hacks():
         # Get deep analysis results
         result_free, result_premium, structured_free, structured_premium = get_deep_analysis(title, summary, content)
 
+        # Enrich it using the validation sources
+        new_result_free, new_result_premium = grow_descriptions(hack_id, result_free, result_premium)
+
         # Save analysis results to hack_descriptions
         description_query = f"""
             INSERT INTO hack_descriptions (hack_id, title, brief_summary, deep_analysis_free, deep_analysis_premium)
             VALUES ({hack_id}, {title}, {summary}, {result_free}, {result_premium});"""
         execute_in_postgres(description_query)
 
-        structured_free, structured_premium, _, _ = get_structured_analysis(result_free, result_premium)
+        structured_free, structured_premium, _, _ = get_structured_analysis(hack_id, new_result_free, new_result_premium)
         
         # Save structured analysis to hack_structured_info
         hack_title = structured_free
@@ -247,6 +252,22 @@ def analyze_validated_hacks():
         execute_in_postgres(structured_query)
 
     print(f"Completed descriptions for {len(unanalized_hacks)} hacks.")
+
+def grow_descriptions(hack_id, free_description, premium_description, times=4, k=5):
+    model = llm_models.LLMmodel("gpt-4o-mini")
+    rag = llm_models.RAG_LLMmodel("gpt-4o-mini", chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
+    
+    documents = rag.retrieve_similar_for_hack(hack_id, free_description+premium_description, k=k*times)
+    # Randomize the order of elements in the list
+    random.shuffle(documents)
+
+    for i in range(times):
+        chunks = ""
+        for document in documents[i * k: (i + 1) * k]:
+            chunks += f"Relevant context section: \n\"\"\"{document.page_content}\n\"\"\" \n"
+        print(f"Extending descriptions: iter = {i+1}")
+        free_description, premium_description, _, _= enriched_analysis(free_description, premium_description, chunks)
+    return free_description, premium_description
 
 def classify_hacks():
     # Retrieve hacks not yet classified
