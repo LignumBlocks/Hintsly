@@ -2,24 +2,46 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 
+# Load environment variables from a .env file
 load_dotenv()
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 def connect_to_postgres():
+    """
+    Establishes a connection to the PostgreSQL database using the connection string
+    from the environment variable 'DATABASE_URL'.
+    
+    Returns:
+        psycopg2.connection: A connection object to interact with the PostgreSQL database.
+    """
     conn = psycopg2.connect(DATABASE_URL)
     return conn
 
-def read_from_postgres(query: str = "SELECT * FROM scraping_results;"):
+def read_from_postgres(query: str):
+    """
+    Executes a PostgreSQL query and retrieves the result from the PostgreSQL database.
+
+    Args:
+        query (str): The PostgreSQL query to be executed.
+    
+    Returns:
+        tuple: A tuple containing two elements:
+            - rows (list): A list of rows retrieved from the query.
+            - colnames (list): A list of column names from the query result.
+    """
     conn = connect_to_postgres()
     cursor = conn.cursor()
     try:
+        # Execute the provided query
         cursor.execute(query)
+        # Fetch column names from the result
         colnames = [desc[0] for desc in cursor.description]
-        print(f"{' | '.join(colnames)}") # id | file_name | source | query | title | description | link | content | scraped_at
+        print(f"{' | '.join(colnames)}")
         print("-" * 80)
 
+        # Fetch all rows
         rows = cursor.fetchall()
-        print(rows[0])
+        # print(rows[0])
         return rows, colnames
     except Exception as e:
         print(f"Error reading from PostgreSQL: {e}")
@@ -28,9 +50,19 @@ def read_from_postgres(query: str = "SELECT * FROM scraping_results;"):
         conn.close()
 
 def execute_in_postgres(query: str):
+    """
+    Executes an PostgreSQL statement that modifies data in the PostgreSQL database (e.g., INSERT, UPDATE, DELETE).
+
+    Args:
+        query (str): The PostgreSQL query to be executed.
+    
+    Returns:
+        cursor (psycopg2.cursor): A cursor object for the executed query.
+    """
     conn = connect_to_postgres()
     cursor = conn.cursor()
     try:
+        # Execute the provided query and commit the transaction
         cursor.execute(query)
         conn.commit()
         return cursor
@@ -40,10 +72,20 @@ def execute_in_postgres(query: str):
         cursor.close()
         conn.close()
 
-def get_table_structure():
+def get_table_structures():
+    """
+    Retrieves the structure of all tables in the 'public' schema from the PostgreSQL database,
+    including table names, column names, data types, and default values.
+
+    Returns:
+        dict: A dictionary representing the table structure. 
+        The keys are table names, and the values are dictionaries with column names as keys and
+        data type and column default values as nested dictionaries.
+    """
     conn = connect_to_postgres()
     cursor = conn.cursor()
     try:
+        # Query to fetch table names, column names, data types, and default values
         cursor.execute("""
             SELECT table_name, column_name, data_type, column_default
             FROM information_schema.columns
@@ -52,6 +94,7 @@ def get_table_structure():
         """)
         table_structure = {}
         current_table = None
+        # Process each row from the result
         for row in cursor:
             table_name = row[0]
             if current_table != table_name:
@@ -70,17 +113,20 @@ def get_table_structure():
 
 def create_table(table_name: str, columns: dict):
     """
-    Create a table at the database if does not exists
+    Create a table it the PostgreSQL database if it does not exists
 
     Args:
-        table_name (str): Name of the table to create.
-        columns (dict): Dictionary with the columns in the following format {column_name: data_type}.
+        table_name (str): The name of the table to create.
+        columns (dict): A dictionary defining the table's columns. 
+                        The keys are column names and the values are data types (e.g., {"id": "SERIAL PRIMARY KEY", "name": "TEXT"}).
     """
     conn = connect_to_postgres()
     cursor = conn.cursor()
     try:
+        # Construct the column definitions for the CREATE TABLE statement
         column_defs = ", ".join(f"{name} {data_type}" for name, data_type in columns.items())
     
+        # Build the CREATE TABLE query
         query = f"""
             CREATE TABLE IF NOT EXISTS {table_name} (
                 {column_defs}
@@ -88,6 +134,7 @@ def create_table(table_name: str, columns: dict):
         """
         print(query)
         
+        # Execute the query and commit the changes
         cursor.execute(query)
         conn.commit()
         print(f"Table '{table_name}' created.")
@@ -98,9 +145,16 @@ def create_table(table_name: str, columns: dict):
         conn.close()
         
 def delete_tables(table_names):
+    """
+    Deletes the specified tables from the PostgreSQL database if they exist.
+
+    Args:
+        table_names (list): A list of table names to delete.
+    """
     conn = connect_to_postgres()
     cursor = conn.cursor()
     try:
+        # Loop through the provided table names and delete each one
         for table_name in table_names:
             cursor.execute(f"DROP TABLE IF EXISTS {table_name};")
         conn.commit()
@@ -112,30 +166,18 @@ def delete_tables(table_names):
         conn.close()
 
 if __name__ == "__main__":
-    # delete_tables(['hack_financial_category', "hack_complexity", "complexities", "financial_categories", "hack_classifications"])
-    alter_query = """
-    ALTER TABLE validation 
-    RENAME COLUMN query_id TO hack_id;
-
-    ALTER TABLE validation
-    ALTER COLUMN hack_id TYPE INTEGER;
-
-    ALTER TABLE validation
-    ADD CONSTRAINT hack_id_fkey FOREIGN KEY (hack_id) REFERENCES hacks(id);"""
-    alter_query = """
-    ALTER TABLE validation_sources
-    ADD COLUMN query TEXT;
-    """
-    alter_query = """ALTER TABLE hack_financial_category 
-    RENAME COLUMN complexity_details TO financial_category_details;"""
-    # execute_in_postgres(alter_query)
+    
     # Define the tables structures
     tables = {
         "transcriptions": {
             "id": "SERIAL PRIMARY KEY",
-            "file_name": "VARCHAR(255)",
-            "source": "VARCHAR(255)",
-            "content": "TEXT"
+            "download": "VARCHAR(255)",
+            "url": "VARCHAR(255)",
+            "content": "TEXT",
+            "channel_name": "VARCHAR(255)",
+            "video_identifier" : "VARCHAR(255)",
+            "video_publication_date": "DATE",
+            "added_at": "TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()"
         },
         "hacks_verification": {
             "id": "SERIAL PRIMARY KEY",
@@ -231,10 +273,10 @@ if __name__ == "__main__":
     # for table_name, columns in tables.items():
     #     create_table(table_name, columns)
 
-    table_structure = get_table_structure()
+    # table_structure = get_table_structures()
 
-    # Print the table structure
-    for table_name, columns in table_structure.items():
-        print(f"Table: {table_name}")
-        for column_name, info in columns.items():
-            print(f"  Column: {column_name}, Type: {info['data_type']}, Default: {info['column_default']}")
+    # # Print the table structure
+    # for table_name, columns in table_structure.items():
+    #     print(f"Table: {table_name}")
+    #     for column_name, info in columns.items():
+    #         print(f"  Column: {column_name}, Type: {info['data_type']}, Default: {info['column_default']}")
