@@ -128,12 +128,17 @@ def enriched_analysis(free_description, premium_description, chunks):
         model = llm_models.LLMmodel("gpt-4o-mini")
 
         prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['ENRICHED_ANALYSIS_FREE'])
-        prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['ENRICHED_ANALYSIS_FREE'])
+        prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['ENRICHED_ANALYSIS_PREMIUM'])
         free_prompt = prompt_template_free.format(chunks=chunks, previous_analysis=free_description)
         system_prompt = "You are a financial analyst specializing in creating financial hacks for users in the USA."
         
         result_free = model.run(free_prompt, system_prompt)
         premium_prompt = prompt_template_premium.format(chunks=chunks, free_analysis=result_free, previous_analysis=premium_description)
+
+        # print("FREE PROMPT:", free_prompt)
+        # print("PREMIUM PROMPT:", premium_prompt)
+        # import time
+        # time.sleep(60)
         result_premium = model.run(premium_prompt, system_prompt)
         
         return result_free, result_premium, free_prompt, premium_prompt 

@@ -210,7 +210,7 @@ def analyze_validated_hacks():
         );"""
     unanalized_hacks, _ = read_from_postgres(unanalized_hacks_query)
     
-    for hack in [1]:
+    for hack in unanalized_hacks:
         hack_id = hack[0]
         title = hack[1]
         summary = hack[2]
@@ -228,7 +228,7 @@ def analyze_validated_hacks():
             VALUES ({hack_id}, {title}, {summary}, {result_free}, {result_premium});"""
         execute_in_postgres(description_query)
 
-        structured_free, structured_premium, _, _ = get_structured_analysis(hack_id, new_result_free, new_result_premium)
+        structured_free, structured_premium, _, _ = get_structured_analysis(new_result_free, new_result_premium)
         
         # Save structured analysis to hack_structured_info
         hack_title = structured_free
@@ -261,13 +261,18 @@ def grow_descriptions(hack_id, free_description, premium_description, times=4, k
     # Randomize the order of elements in the list
     random.shuffle(documents)
 
+    latest_free = free_description
+    latest_premium = premium_description
+
     for i in range(times):
         chunks = ""
         for document in documents[i * k: (i + 1) * k]:
             chunks += f"Relevant context section: \n\"\"\"{document.page_content}\n\"\"\" \n"
         print(f"Extending descriptions: iter = {i+1}")
-        free_description, premium_description, _, _= enriched_analysis(free_description, premium_description, chunks)
-    return free_description, premium_description
+        free_description, premium_description, _, _= enriched_analysis(latest_free, latest_premium, chunks)
+        latest_free = free_description
+        latest_premium = premium_description
+    return latest_free, latest_premium
 
 def classify_hacks():
     # Retrieve hacks not yet classified

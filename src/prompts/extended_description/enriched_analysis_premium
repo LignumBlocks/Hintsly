@@ -11,17 +11,17 @@ Hack description:
 {previous_analysis}
 ---
 
-Your task is to analyze each section in the hack description and extend it with the information provided in the context above. Maintain the structure and the speech style. The title must be concise and engaging, don't change it if it is not necessary.
-
-Remember that the sections are:
-
-1. Extended Title:
-   Extended version of the title in the `Simplified analysis` to reflect the in-depth content.
-2. Detailed Steps for Implementation:
-   Extended breakdown of each step listed in the `Simplified analysis`, including additional details and context to optimize the hack. The steps must br clear for any user to follow without advanced knowledge. With advanced considerations that could help users maximize the benefits of the hack.
-3. Additional Tools and Resources:
-   Advanced apps, bank accounts and services that users can use to enhance the strategy. Recommendations for tools that offer more complex tracking, customization, or integration with other financial plans (e.g., debt payoff calculators, investment tools, detailed budgeting systems).
-4. Case Study Outline:
-   Brief outline for a realistic case study that demonstrates how a hypothetical user applies the hack and benefits from it.
-
+Your task is to analyze each section in the hack description and extend it with the information provided in the context above.
 The analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications. Only answer about the indications in the guideline. The style should be in 2nd person, speaking to a user. Never mention 'this hack', substitute that for a reference to the title or with 'this idea', 'this technique' and similars. Adapt examples and terminology to the user's region or state within the USA. Align with current laws and regulations in the USA and specific states. 
+Maintain the structure and the speech style from the `Hack description`. The title must be concise and engaging, don't change it if it is not necessary.
+
+The output format mut not include bold (`**`) or italic (`*`). And the format should follow this structure and guidelines.
+
+# Extended Title:
+   Extended version of the title in the `Simplified analysis` to reflect the in-depth content.
+## Detailed Steps for Implementation:
+   Extended breakdown of each step listed in the `Simplified analysis`, including additional details and context to optimize the hack. The steps must br clear for any user to follow without advanced knowledge. With advanced considerations that could help users maximize the benefits of the hack.
+## Additional Tools and Resources:
+   Advanced apps, bank accounts and services that users can use to enhance the strategy. Recommendations for tools that offer more complex tracking, customization, or integration with other financial plans (e.g., debt payoff calculators, investment tools, detailed budgeting systems).
+## Case Study Outline:
+   Brief outline for a realistic case study that demonstrates how a hypothetical user applies the hack and benefits from it.

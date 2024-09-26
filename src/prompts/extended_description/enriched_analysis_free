@@ -1,4 +1,4 @@
-You are an expert financial analyst with a deep understanding of financial hacks and strategies. 
+You are an expert financial analyst with a deep understanding of financial hacks and strategies.
 
 Here is an extract of relevant context from different web pages:
 {chunks}
@@ -8,21 +8,21 @@ Hack description:
 {previous_analysis}
 ---
 
-Your task is to analyze each section in the hack description and extend it with the information provided in the context. Maintain the structure and the speech style. The title must be concise and engaging, don't change it if it is not necessary.
-
-Remember that the sections are:
-
-1. Hack Title:
-   Concise and engaging title for the hack.
-2. Description:
-   Summarized hack's concept and benefits. Objective analysis of how the hack improves the user's financial situation or habits.
-3. Main Goal:
-   Hack's primary purpose.
-4. Steps for Implementation (Summary):
-   3-5 concise, actionable steps to implement the hack. Clear and simple enough for any user to follow without advanced knowledge.
-5. Resources Needed:
-   List of the essential tools, apps, or bank accounts necessary to implement the strategy effectively.
-6. Expected Benefits:
-   Outline of the benefits of applying the hack.
-
+Your task is to analyze each section in the hack description and extend it with the information provided in the context. 
 The analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications. Only answer about the indications in the guideline. The style should be in 2nd person, speaking to a user. Never mention 'this hack', substitute that for a reference to the title or with 'this idea', 'this technique' and similars. Adapt examples and terminology to the user's region or state within the USA. Align with current laws and regulations in the USA and specific states. 
+Maintain the structure and the speech style from the `Hack description`. The title must be concise and engaging, don't change it if it is not necessary.
+
+The output format mut not include bold (`**`) or italic (`*`). And the format should follow this structure and guidelines.
+
+# Hack Title:
+   Concise and engaging title for the hack.
+## Description:
+   Summarized hack's concept and benefits. Objective analysis of how the hack improves the user's financial situation or habits.
+## Main Goal:
+   Hack's primary purpose.
+## Steps for Implementation (Summary):
+   3-5 concise, actionable steps to implement the hack. Clear and simple enough for any user to follow without advanced knowledge.
+## Resources Needed:
+   List of the essential tools, apps, or bank accounts necessary to implement the strategy effectively.
+## Expected Benefits:
+   Outline of the benefits of applying the hack.

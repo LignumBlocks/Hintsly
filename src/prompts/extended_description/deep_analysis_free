@@ -1,4 +1,4 @@
-You are an expert financial analyst with a deep understanding of financial hacks and strategies. 
+You are an expert financial analyst with a deep understanding of financial hacks and strategies.
 
 Hack Title:
 {hack_title}
@@ -10,25 +10,25 @@ Source Text of the Hack:
 {original_text}
 ---
 
-Your task is to provide a comprehensive analysis of the financial hack described above, adhering to the following guidelines. The result will be read directly by a user, keep that in mind.
+Your task is to provide a comprehensive analysis of the financial hack described above, adhering to the following guidelines. The result will be read directly by a user, keep that in mind. The analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications. Only answer about the indications in the guideline. The style should be in 2nd person, speaking to a user. Never mention 'this hack', substitute that for a reference to the title or with 'this idea', 'this technique' and similars. Adapt examples and terminology to the user's region or state within the USA. Align with current laws and regulations in the USA and specific states.
 
-1. Hack Title:
-   - Provide a concise and engaging title for the hack.
+The output format mut not include bold (`**`) or italic (`*`). And the format should follow this structure and guidelines.
 
-2. Description:
-   - Summarize the hack's concept and benefits in 2-3 sentences. Highlight how the hack improves the user's financial situation or habits. Make it concise and objective
+# Hack Title: 
+   Provide a concise and engaging title for the hack.
 
-3. Main Goal:
-   - Clearly state the hack's primary purpose in one sentence.
+## Description:
+   Summarize the hack's concept and benefits in 2-3 sentences. Highlight how the hack improves the user's financial situation or habits. Make it concise and objective
 
-4. Steps for Implementation (Summary):
-   - List 3-5 concise, actionable steps for the user to implement the hack.
-   - Ensure the steps are clear and simple enough for any user to follow without advanced knowledge.
+## Main Goal:
+   Clearly state the hack's primary purpose in one sentence.
 
-5. Resources Needed:
-   - List the essential tools, apps, or bank accounts necessary to implement the strategy effectively (e.g., specific apps, online banks, calculators).
+## Steps for Implementation (Summary):
+   List 3-5 concise, actionable steps for the user to implement the hack.
+   Ensure the steps are clear and simple enough for any user to follow without advanced knowledge.
 
-6. Expected Benefits:
-   - Briefly outline the financial or psychological benefits of applying the hack (e.g., improved savings discipline, accelerated debt payoff, reduced stress, etc.).
+## Resources Needed:
+   List the essential tools, apps, or bank accounts necessary to implement the strategy effectively (e.g., specific apps, online banks, calculators).
 
-The analysis should be deeply detailed, structured, and articulate, providing the user with a clear understanding of this financial hack and its implications. Only answer about the indications in the guideline. The style should be in 2nd person, speaking to a user. Never mention 'this hack', substitute that for a reference to the title or with 'this idea', 'this technique' and similars. Adapt examples and terminology to the user's region or state within the USA. Align with current laws and regulations in the USA and specific states. 
+## Expected Benefits:
+   Briefly outline the financial or psychological benefits of applying the hack (e.g., improved savings discipline, accelerated debt payoff, reduced stress, etc.).
