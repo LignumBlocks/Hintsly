@@ -4,13 +4,15 @@ import llm_models
 from settings import PROMPTS_TEMPLATES, DATA_DIR
 
 def load_prompt(*args):
-    """Constructs a prompt from the prompting files in the prompts directory.
+    """
+    Constructs a prompt by loading the content from one or more prompt template files in the prompts directory.
 
     Args:
-        args (str): The names of the prompting files to include in the prompt.
+        args (str): The file paths of the prompt templates to load.
 
     Returns:
-        str: The constructed prompt."""
+        str: The combined content of the loaded prompt templates.
+    """
 
     prompt = ""
     for file_path in args:
@@ -18,29 +20,21 @@ def load_prompt(*args):
             prompt += file.read().strip()
     return prompt
 
-
-# class HackDiscrimination(BaseModel):
-#     justification: str = Field(description="Explanation about whether the content meets the criteria of a financial hack")
-#     is_a_hack: bool = Field(description="Whether the content include a valid financial hack")
-
-
 def verify_hacks_from_text(source_text: str):
-    """ Determine whether the text constitutes a hack or not, returning structured JSON style.
-    
+    """
+    Analyzes a piece of text to determine if it constitutes a financial hack, returning a JSON result.
+
     Args:
-        source_text (str): Text content to analyse.
+        source_text (str): The text content to analyze.
 
     Returns:
-        `dict: { 
-                "justification": "<analisys of whether is a hack or not>",
-                "is_a_hack": "<true or false>" 
-            }`
+        dict: A dictionary with justification and a boolean indicating whether the text is considered a hack.
+        str: The constructed prompt used to generate the result.
     """
     prompt_template:str = load_prompt(PROMPTS_TEMPLATES['HACK_VERIFICATION2'])
     prompt = prompt_template.format(source_text=source_text)
     system_prompt = "You are an AI financial analyst tasked with classifying content related to financial strategies."
-    # print(prompt)
-    # return
+    
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
         result:str = model.run(prompt, system_prompt)
@@ -53,15 +47,18 @@ def verify_hacks_from_text(source_text: str):
         return None, prompt
     
 def get_queries_for_validation(hack_title: str, source_text: str, num_queries: int=4):
-    """ For a hack summary select queries to validate against real sources.
-    
+    """
+    Generates a list of queries to validate a financial hack against real-world sources.
+
     Args:
-        source_text (str): Text content to analyse.
+        hack_title (str): The title of the hack.
+        source_text (str): The summary of the hack.
+        num_queries (int): The number of queries to generate (default is 4).
 
     Returns:
-        `list: relevant queries for the given text`
-    """
-    
+        list: A list of relevant queries for validating the hack.
+        str: The constructed prompt used to generate the result.
+    """    
     prompt_template:str = load_prompt(PROMPTS_TEMPLATES['GET_QUERIES'])
     prompt = prompt_template.format(hack_title=hack_title, hack_summary=source_text, num_queries=num_queries)
     system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
@@ -78,13 +75,26 @@ def get_queries_for_validation(hack_title: str, source_text: str, num_queries: i
         return None, prompt
 
 def validate_financial_hack(hack_id, hack_title: str, hack_summary: str, queries_dict: list):
+    """
+    Validates a financial hack by retrieving relevant documents from a vector store and analyzing the information.
+
+    Args:
+        hack_id (str): The identifier of the hack.
+        hack_title (str): The title of the hack.
+        hack_summary (str): The summary of the hack.
+        queries_dict (list): A list of queries for validating the hack.
+
+    Returns:
+        dict: A dictionary with the validation results.
+        str: The constructed prompt used for validation.
+        list: Metadata of the retrieved documents.
+    """
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
         rag = llm_models.RAG_LLMmodel("gpt-4o-mini", chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
-        rag.store_from_query_csv(queries_dict, hack_id)
+        rag.store_from_queries(queries_dict, hack_id)
         chunks = ""
         metadata = []
-        # print(model.vector_store)
         for result in rag.retrieve_similar_for_hack(hack_id, hack_title+ ':\n'+hack_summary):
             print(result.metadata)
             metadata.append((result.metadata['link'], result.metadata['source']))
@@ -108,6 +118,17 @@ def validate_financial_hack(hack_id, hack_title: str, hack_summary: str, queries
         return None, None, None
 
 def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
+    """
+    Performs a deep analysis of a financial hack by generating both free and premium-level analysis.
+
+    Args:
+        hack_title (str): The title of the hack.
+        hack_summary (str): The summary of the hack.
+        original_text (str): The original source text for the hack.
+
+    Returns:
+        tuple: A tuple containing free and premium-level analysis results along with the prompts used.
+    """
     prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_FREE'])
     prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['DEEP_ANALYSIS_PREMIUM'])
     prompt_free = prompt_template_free.format(hack_title=hack_title, hack_summary=hack_summary, original_text=original_text)
@@ -124,6 +145,17 @@ def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
         return None, None, None, None
 
 def enriched_analysis(free_description, premium_description, chunks):
+    """
+    Performs an enriched analysis by further refining both free and premium analyses of a financial hack.
+
+    Args:
+        free_description (str): The result of the free analysis.
+        premium_description (str): The result of the premium analysis.
+        chunks (str): Additional text or documents related to the hack.
+
+    Returns:
+        tuple: A tuple containing updated free and premium analyses along with the prompts used.
+    """
     try:
         model = llm_models.LLMmodel("gpt-4o-mini")
 
@@ -134,11 +166,6 @@ def enriched_analysis(free_description, premium_description, chunks):
         
         result_free = model.run(free_prompt, system_prompt)
         premium_prompt = prompt_template_premium.format(chunks=chunks, free_analysis=result_free, previous_analysis=premium_description)
-
-        # print("FREE PROMPT:", free_prompt)
-        # print("PREMIUM PROMPT:", premium_prompt)
-        # import time
-        # time.sleep(60)
         result_premium = model.run(premium_prompt, system_prompt)
         
         return result_free, result_premium, free_prompt, premium_prompt 
@@ -147,6 +174,16 @@ def enriched_analysis(free_description, premium_description, chunks):
         return None, None, None
 
 def get_structured_analysis(result_free: str, result_premium: str):
+    """
+    Extract the structured information from the free hack description and the premium hack description.
+
+    Args:
+        result_free (str): The result of the free hack description.
+        result_premium (str): The result of the premium hack description.
+
+    Returns:
+        tuple: A tuple containing structured analysis results (in JSON format) for both free and premium analyses along with the prompts used.
+    """
     prompt_template_free:str = load_prompt(PROMPTS_TEMPLATES['STRCT_DEEP_ANALYSIS_FREE'])
     prompt_template_premium:str = load_prompt(PROMPTS_TEMPLATES['STRCT_DEEP_ANALYSIS_PREMIUM'])
     prompt_free = prompt_template_free.format(free_analysis=result_free)
@@ -177,6 +214,15 @@ def get_structured_analysis(result_free: str, result_premium: str):
         return None, None, prompt_free, prompt_premium
 
 def get_hack_classifications(result_free: str):
+    """
+    Classifies a financial hack based on several parameters.
+
+    Args:
+        result_free (str): The result of the enriched free hack description.
+
+    Returns:
+        tuple: A tuple containing the classification for each parameter.
+    """
     prompt_template_complexity:str = load_prompt(PROMPTS_TEMPLATES['COMPLEXITY_TAG'])
     prompt_template_categories:str = load_prompt(PROMPTS_TEMPLATES['CLASIFICATION_TAGS'])
     prompt_complexity = prompt_template_complexity.format(hack_description=result_free)
