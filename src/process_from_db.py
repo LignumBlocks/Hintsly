@@ -122,7 +122,7 @@ def validate_hacks():
     WHERE v.hack_id IS NULL;"""
     unvalidated_hacks, _ = read_from_postgres(unvalidated_hacks_query)
 
-    # Qquery to get validation sources related to the unvalidated hacks
+    # Query to get validation sources related to the unvalidated hacks
     validation_sources_query = """
     SELECT q.hack_id, vs.query, vs.source, vs.title, vs.description, vs.link, vs.content
     FROM queries q
@@ -358,7 +358,6 @@ def classify_hacks():
     FROM hacks h 
     JOIN hack_descriptions hd ON h.id = hd.hack_id 
     WHERE NOT EXISTS (SELECT 1 FROM classified_hack WHERE classified_hack.hack_id = h.id);"""
-    
     unprocessed_hacks, _ = read_from_postgres(unprocessed_hacks_query)
 
     # Process each hack for classification
