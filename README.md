@@ -146,12 +146,6 @@ This file retrieves for each task the data from the database, applies the corres
 
 ---
 
-## Example of the full functionality starting from a transcription until the all the information is extracted from the hack
-
-...
-
----
-
 ## Troubleshooting
 
 1. **Database Connection Errors**:
