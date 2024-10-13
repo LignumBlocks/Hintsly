@@ -90,33 +90,37 @@ def validate_financial_hack(hack_id, hack_title: str, hack_summary: str, queries
         list: Metadata of the retrieved documents.
     """
     try:
-        model = llm_models.LLMmodel("gpt-4o-mini")
         rag = llm_models.RAG_LLMmodel("gpt-4o-mini", chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
         rag.store_from_queries(queries_dict, hack_id)
-        chunks = ""
-        metadata = []
-        for result in rag.retrieve_similar_for_hack(hack_id, hack_title+ ':\n'+hack_summary):
-            print(result.metadata)
-            metadata.append((result.metadata['link'], result.metadata['source']))
-            chunks += result.page_content + "\n"
-
-        prompt_template:str = load_prompt(PROMPTS_TEMPLATES['VALIDATE_HACK'])
-        prompt = prompt_template.format(chunks=chunks, hack_title=hack_title, hack_summary=hack_summary)
-        system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
-        
-        result:str = model.run(prompt, system_prompt)
-        try:
-            cleaned_string = result.replace("```json\n", "").replace("```","")
-            # Strip leading and trailing whitespace
-            cleaned_string = cleaned_string.strip()
-            result = cleaned_string
-        except:
-            pass
-        return json.loads(result), prompt, metadata
+        return _validation_retrieval_generation(hack_id, hack_title, hack_summary)
     except Exception as er:
         print(f"Error validating hacks: {er}")
         return None, None, None
 
+def _validation_retrieval_generation(hack_id, hack_title: str, hack_summary: str):
+    model = llm_models.LLMmodel("gpt-4o-mini")
+    rag = llm_models.RAG_LLMmodel("gpt-4o-mini", chroma_path=os.path.join(DATA_DIR, 'chroma_db'))
+    chunks = ""
+    metadata = []
+    for result in rag.retrieve_similar_for_hack(hack_id, hack_title+ ':\n'+hack_summary):
+        print(result.metadata)
+        metadata.append((result.metadata['link'], result.metadata['source']))
+        chunks += result.page_content + "\n"
+
+    prompt_template:str = load_prompt(PROMPTS_TEMPLATES['VALIDATE_HACK'])
+    prompt = prompt_template.format(chunks=chunks, hack_title=hack_title, hack_summary=hack_summary)
+    system_prompt = "You are an AI financial analyst tasked with accepting or refusing the validity of a financial hack."
+    
+    result:str = model.run(prompt, system_prompt)
+    try:
+        cleaned_string = result.replace("```json\n", "").replace("```","")
+        # Strip leading and trailing whitespace
+        cleaned_string = cleaned_string.strip()
+        result = cleaned_string
+    except:
+        pass
+    return json.loads(result), prompt, metadata
+    
 def get_deep_analysis(hack_title: str, hack_summary: str, original_text: str):
     """
     Performs a deep analysis of a financial hack by generating both free and premium-level analysis.

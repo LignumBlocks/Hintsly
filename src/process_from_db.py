@@ -272,7 +272,7 @@ def analyze_validated_hacks():
         content = hack[3]
 
         # Get deep analysis results (free and premium) for the hack
-        result_free, result_premium, structured_free, structured_premium = get_deep_analysis(title, summary, content)
+        result_free, result_premium, prompt_free, prompt_premium = get_deep_analysis(title, summary, content)
 
         # Enrich the descriptions using validation sources
         new_result_free, new_result_premium = grow_descriptions(hack_id, result_free, result_premium)
@@ -280,7 +280,7 @@ def analyze_validated_hacks():
         # Save the analysis results in the 'hack_descriptions' table
         description_query = f"""
             INSERT INTO hack_descriptions (hack_id, title, brief_summary, deep_analysis_free, deep_analysis_premium)
-            VALUES ({hack_id}, {title}, {summary}, {result_free}, {result_premium});"""
+            VALUES ({hack_id}, {title}, {summary}, {new_result_free}, {new_result_premium});"""
         execute_in_postgres(description_query)
 
         # Get structured dictionary of the descriptions (free and premium) after enrichment
@@ -308,7 +308,7 @@ def analyze_validated_hacks():
 
     print(f"Completed descriptions for {len(unanalized_hacks)} hacks.")
 
-def grow_descriptions(hack_id, free_description, premium_description, times=4, k=5):
+def grow_descriptions(hack_id, free_description, premium_description, times=6, k=5):
     """
     Enriches the initial free and premium analysis of a hack by iterating through multiple document chunks
     retrieved from a similarity search in the vector store. This process extends the existing descriptions
